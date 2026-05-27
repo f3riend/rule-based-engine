@@ -1,0 +1,1966 @@
+================================================================================
+FAKE AI API TEST RESULTS
+================================================================================
+
+TEST: Health Endpoint
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.733816
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "ok": true,
+      "server_time": "2026-05-21T22:20:57.733414",
+      "agent": {
+        "id": 1,
+        "name": "Fake AI Agent",
+        "status": "active"
+      },
+      "token": {
+        "scope": "admin",
+        "rate_limit_per_min": 999
+      }
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Invalid Token Test
+STATUS: FAIL
+TIME: 2026-05-21T22:20:57.734884
+RESPONSE:
+{
+  "status_code": 403,
+  "data": {
+    "detail": "Invalid token"
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: No Token Test
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.735875
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "ok": true,
+      "server_time": "2026-05-21T22:20:57.735627",
+      "agent": {
+        "id": 1,
+        "name": "Fake AI Agent",
+        "status": "active"
+      },
+      "token": {
+        "scope": "admin",
+        "rate_limit_per_min": 999
+      }
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Create Store
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.745004
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "id": 3
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Create Product
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.750982
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "id": 3
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Create Order
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.766364
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "id": 3,
+      "order_event_id": 14,
+      "stock_event_id": 15
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Timeline All
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.768535
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "ts": "2026-05-21T22:00:50.173315",
+        "event": "created",
+        "event_label": "Created",
+        "group": "store",
+        "group_label": "Stores",
+        "description": "Store created: Coffee Lab",
+        "store_id": 1,
+        "subject": {
+          "type": "Store",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": null
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 2,
+        "ts": "2026-05-21T22:00:57.800642",
+        "event": "created",
+        "event_label": "Created",
+        "group": "product",
+        "group_label": "Products",
+        "description": "Product created: Premium Mug",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "category": null
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 3,
+        "ts": "2026-05-21T22:01:07.476203",
+        "event": "created",
+        "event_label": "Created",
+        "group": "order",
+        "group_label": "Orders",
+        "description": "Order created #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Order",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "item_id": 1,
+          "quantity": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 4,
+        "ts": "2026-05-21T22:01:07.478814",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 50,
+            "to": 48
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 48
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 5,
+        "ts": "2026-05-21T22:04:38.301228",
+        "event": "created",
+        "event_label": "Created",
+        "group": "banner",
+        "group_label": "Banners",
+        "description": "Banner created: Summer Campaign",
+        "store_id": 1,
+        "subject": {
+          "type": "Banner",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "title": "Summer Campaign",
+          "image_url": "https://example.com/banner.jpg"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 6,
+        "ts": "2026-05-21T22:06:15.105225",
+        "event": "created",
+        "event_label": "Created",
+        "group": "store",
+        "group_label": "Stores",
+        "description": "Store created: Coffee Lab",
+        "store_id": 2,
+        "subject": {
+          "type": "Store",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": "@coffeelab"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 7,
+        "ts": "2026-05-21T22:06:15.111841",
+        "event": "created",
+        "event_label": "Created",
+        "group": "product",
+        "group_label": "Products",
+        "description": "Product created: Premium Mug",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "category": "Mugs"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 8,
+        "ts": "2026-05-21T22:06:15.118372",
+        "event": "created",
+        "event_label": "Created",
+        "group": "order",
+        "group_label": "Orders",
+        "description": "Order created #2",
+        "store_id": 1,
+        "subject": {
+          "type": "Order",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "item_id": 1,
+          "quantity": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 9,
+        "ts": "2026-05-21T22:06:15.120540",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 48,
+            "to": 46
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 46
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 10,
+        "ts": "2026-05-21T22:06:15.148565",
+        "event": "created",
+        "event_label": "Created",
+        "group": "banner",
+        "group_label": "Banners",
+        "description": "Banner created: Summer Campaign",
+        "store_id": 1,
+        "subject": {
+          "type": "Banner",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "title": "Summer Campaign",
+          "image_url": "https://example.com/banner.jpg"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 11,
+        "ts": "2026-05-21T22:06:15.367000",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Manual stock update for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 46,
+            "to": 4
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 4
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 12,
+        "ts": "2026-05-21T22:20:57.742378",
+        "event": "created",
+        "event_label": "Created",
+        "group": "store",
+        "group_label": "Stores",
+        "description": "Store created: Coffee Lab",
+        "store_id": 3,
+        "subject": {
+          "type": "Store",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": "@coffeelab"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 13,
+        "ts": "2026-05-21T22:20:57.748494",
+        "event": "created",
+        "event_label": "Created",
+        "group": "product",
+        "group_label": "Products",
+        "description": "Product created: Premium Mug",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "category": "Mugs"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 14,
+        "ts": "2026-05-21T22:20:57.754852",
+        "event": "created",
+        "event_label": "Created",
+        "group": "order",
+        "group_label": "Orders",
+        "description": "Order created #3",
+        "store_id": 1,
+        "subject": {
+          "type": "Order",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "item_id": 1,
+          "quantity": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 15,
+        "ts": "2026-05-21T22:20:57.757123",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 4,
+            "to": 2
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      }
+    ],
+    "pagination": {
+      "count": 15,
+      "limit": 50,
+      "direction": "asc",
+      "next_cursor": 15,
+      "has_more": false
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Timeline Stock Events
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.769998
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 15,
+        "ts": "2026-05-21T22:20:57.757123",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 4,
+            "to": 2
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 11,
+        "ts": "2026-05-21T22:06:15.367000",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Manual stock update for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 46,
+            "to": 4
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 4
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 9,
+        "ts": "2026-05-21T22:06:15.120540",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 48,
+            "to": 46
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 46
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 4,
+        "ts": "2026-05-21T22:01:07.478814",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 50,
+            "to": 48
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 48
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      }
+    ],
+    "pagination": {
+      "count": 4,
+      "limit": 50,
+      "direction": "desc",
+      "next_cursor": 4,
+      "has_more": false
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Timeline Cursor
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.771724
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 5,
+        "ts": "2026-05-21T22:04:38.301228",
+        "event": "created",
+        "event_label": "Created",
+        "group": "banner",
+        "group_label": "Banners",
+        "description": "Banner created: Summer Campaign",
+        "store_id": 1,
+        "subject": {
+          "type": "Banner",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "title": "Summer Campaign",
+          "image_url": "https://example.com/banner.jpg"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 6,
+        "ts": "2026-05-21T22:06:15.105225",
+        "event": "created",
+        "event_label": "Created",
+        "group": "store",
+        "group_label": "Stores",
+        "description": "Store created: Coffee Lab",
+        "store_id": 2,
+        "subject": {
+          "type": "Store",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": "@coffeelab"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 7,
+        "ts": "2026-05-21T22:06:15.111841",
+        "event": "created",
+        "event_label": "Created",
+        "group": "product",
+        "group_label": "Products",
+        "description": "Product created: Premium Mug",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "category": "Mugs"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 8,
+        "ts": "2026-05-21T22:06:15.118372",
+        "event": "created",
+        "event_label": "Created",
+        "group": "order",
+        "group_label": "Orders",
+        "description": "Order created #2",
+        "store_id": 1,
+        "subject": {
+          "type": "Order",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "item_id": 1,
+          "quantity": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 9,
+        "ts": "2026-05-21T22:06:15.120540",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 48,
+            "to": 46
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 46
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 10,
+        "ts": "2026-05-21T22:06:15.148565",
+        "event": "created",
+        "event_label": "Created",
+        "group": "banner",
+        "group_label": "Banners",
+        "description": "Banner created: Summer Campaign",
+        "store_id": 1,
+        "subject": {
+          "type": "Banner",
+          "id": 2
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "title": "Summer Campaign",
+          "image_url": "https://example.com/banner.jpg"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 11,
+        "ts": "2026-05-21T22:06:15.367000",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Manual stock update for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 46,
+            "to": 4
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 4
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 12,
+        "ts": "2026-05-21T22:20:57.742378",
+        "event": "created",
+        "event_label": "Created",
+        "group": "store",
+        "group_label": "Stores",
+        "description": "Store created: Coffee Lab",
+        "store_id": 3,
+        "subject": {
+          "type": "Store",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": "@coffeelab"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 13,
+        "ts": "2026-05-21T22:20:57.748494",
+        "event": "created",
+        "event_label": "Created",
+        "group": "product",
+        "group_label": "Products",
+        "description": "Product created: Premium Mug",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "category": "Mugs"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 14,
+        "ts": "2026-05-21T22:20:57.754852",
+        "event": "created",
+        "event_label": "Created",
+        "group": "order",
+        "group_label": "Orders",
+        "description": "Order created #3",
+        "store_id": 1,
+        "subject": {
+          "type": "Order",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "item_id": 1,
+          "quantity": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 15,
+        "ts": "2026-05-21T22:20:57.757123",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 4,
+            "to": 2
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      }
+    ],
+    "pagination": {
+      "count": 11,
+      "limit": 50,
+      "direction": "asc",
+      "next_cursor": 15,
+      "has_more": false
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Subject Timeline
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.773366
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 15,
+        "event": "updated",
+        "group": "stock",
+        "description": "Stock updated for item #1",
+        "changes": {
+          "stock": {
+            "from": 4,
+            "to": 2
+          }
+        },
+        "ts": "2026-05-21T22:20:57.757123"
+      },
+      {
+        "id": 11,
+        "event": "updated",
+        "group": "stock",
+        "description": "Manual stock update for item #1",
+        "changes": {
+          "stock": {
+            "from": 46,
+            "to": 4
+          }
+        },
+        "ts": "2026-05-21T22:06:15.367000"
+      },
+      {
+        "id": 9,
+        "event": "updated",
+        "group": "stock",
+        "description": "Stock updated for item #1",
+        "changes": {
+          "stock": {
+            "from": 48,
+            "to": 46
+          }
+        },
+        "ts": "2026-05-21T22:06:15.120540"
+      },
+      {
+        "id": 4,
+        "event": "updated",
+        "group": "stock",
+        "description": "Stock updated for item #1",
+        "changes": {
+          "stock": {
+            "from": 50,
+            "to": 48
+          }
+        },
+        "ts": "2026-05-21T22:01:07.478814"
+      },
+      {
+        "id": 2,
+        "event": "created",
+        "group": "product",
+        "description": "Product created: Premium Mug",
+        "changes": {},
+        "ts": "2026-05-21T22:00:57.800642"
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Resources Discovery
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.774888
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "type": "stores",
+        "filters": [
+          "id",
+          "name"
+        ],
+        "sortable": [
+          "id",
+          "created_at"
+        ],
+        "includes": [],
+        "accessible": true
+      },
+      {
+        "type": "items",
+        "filters": [
+          "store_id",
+          "name",
+          "category"
+        ],
+        "sortable": [
+          "id",
+          "price",
+          "sales",
+          "stock"
+        ],
+        "includes": [
+          "store"
+        ],
+        "accessible": true
+      },
+      {
+        "type": "orders",
+        "filters": [
+          "store_id",
+          "status"
+        ],
+        "sortable": [
+          "id",
+          "created_at"
+        ],
+        "includes": [
+          "item"
+        ],
+        "accessible": true
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Items List
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.776237
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 2,
+        "sales": 6,
+        "category": null,
+        "created_at": "2026-05-21T22:00:57.712192",
+        "updated_at": "2026-05-21T22:20:57.752597"
+      },
+      {
+        "id": 2,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:06:15.109672",
+        "updated_at": "2026-05-21T22:06:15.109672"
+      },
+      {
+        "id": 3,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:20:57.746232",
+        "updated_at": "2026-05-21T22:20:57.746232"
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Items Include Store
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.778939
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 2,
+        "sales": 6,
+        "category": null,
+        "created_at": "2026-05-21T22:00:57.712192",
+        "updated_at": "2026-05-21T22:20:57.752597",
+        "store": {
+          "id": 1,
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": null,
+          "created_at": "2026-05-21T22:00:50.167751",
+          "updated_at": "2026-05-21T22:00:50.167751"
+        }
+      },
+      {
+        "id": 2,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:06:15.109672",
+        "updated_at": "2026-05-21T22:06:15.109672",
+        "store": {
+          "id": 1,
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": null,
+          "created_at": "2026-05-21T22:00:50.167751",
+          "updated_at": "2026-05-21T22:00:50.167751"
+        }
+      },
+      {
+        "id": 3,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:20:57.746232",
+        "updated_at": "2026-05-21T22:20:57.746232",
+        "store": {
+          "id": 1,
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": null,
+          "created_at": "2026-05-21T22:00:50.167751",
+          "updated_at": "2026-05-21T22:00:50.167751"
+        }
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Items Sort
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.780270
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 2,
+        "sales": 6,
+        "category": null,
+        "created_at": "2026-05-21T22:00:57.712192",
+        "updated_at": "2026-05-21T22:20:57.752597"
+      },
+      {
+        "id": 2,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:06:15.109672",
+        "updated_at": "2026-05-21T22:06:15.109672"
+      },
+      {
+        "id": 3,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:20:57.746232",
+        "updated_at": "2026-05-21T22:20:57.746232"
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Items Search
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.781398
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 2,
+        "sales": 6,
+        "category": null,
+        "created_at": "2026-05-21T22:00:57.712192",
+        "updated_at": "2026-05-21T22:20:57.752597"
+      },
+      {
+        "id": 2,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:06:15.109672",
+        "updated_at": "2026-05-21T22:06:15.109672"
+      },
+      {
+        "id": 3,
+        "store_id": 1,
+        "name": "Premium Mug",
+        "price": 299.0,
+        "stock": 50,
+        "sales": 0,
+        "category": "Mugs",
+        "created_at": "2026-05-21T22:20:57.746232",
+        "updated_at": "2026-05-21T22:20:57.746232"
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Items Fields
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.782468
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "name": "Premium Mug",
+        "stock": 2
+      },
+      {
+        "id": 2,
+        "name": "Premium Mug",
+        "stock": 50
+      },
+      {
+        "id": 3,
+        "name": "Premium Mug",
+        "stock": 50
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Items Full Query
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.783568
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "name": "Premium Mug",
+        "stock": 2,
+        "store": {
+          "id": 1,
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": null,
+          "created_at": "2026-05-21T22:00:50.167751",
+          "updated_at": "2026-05-21T22:00:50.167751"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Premium Mug",
+        "stock": 50,
+        "store": {
+          "id": 1,
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": null,
+          "created_at": "2026-05-21T22:00:50.167751",
+          "updated_at": "2026-05-21T22:00:50.167751"
+        }
+      },
+      {
+        "id": 3,
+        "name": "Premium Mug",
+        "stock": 50,
+        "store": {
+          "id": 1,
+          "name": "Coffee Lab",
+          "owner": "Oktay",
+          "instagram": null,
+          "created_at": "2026-05-21T22:00:50.167751",
+          "updated_at": "2026-05-21T22:00:50.167751"
+        }
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Orders List
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.785094
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 3,
+        "store_id": 1,
+        "item_id": 1,
+        "quantity": 2,
+        "status": "pending",
+        "created_at": "2026-05-21T22:20:57.752597",
+        "updated_at": "2026-05-21T22:20:57.752597"
+      },
+      {
+        "id": 2,
+        "store_id": 1,
+        "item_id": 1,
+        "quantity": 2,
+        "status": "pending",
+        "created_at": "2026-05-21T22:06:15.115965",
+        "updated_at": "2026-05-21T22:06:15.115965"
+      },
+      {
+        "id": 1,
+        "store_id": 1,
+        "item_id": 1,
+        "quantity": 2,
+        "status": "pending",
+        "created_at": "2026-05-21T22:01:07.370478",
+        "updated_at": "2026-05-21T22:01:07.370478"
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Create Banner
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.793293
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "id": 3
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Get Banners
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.794892
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 3,
+        "store_id": 1,
+        "title": "Summer Campaign",
+        "image_url": "https://example.com/banner.jpg",
+        "status": "draft",
+        "created_at": "2026-05-21T22:20:57.786151",
+        "updated_at": "2026-05-21T22:20:57.786151"
+      },
+      {
+        "id": 2,
+        "store_id": 1,
+        "title": "Summer Campaign",
+        "image_url": "https://example.com/banner.jpg",
+        "status": "draft",
+        "created_at": "2026-05-21T22:06:15.146254",
+        "updated_at": "2026-05-21T22:06:15.146254"
+      },
+      {
+        "id": 1,
+        "store_id": 1,
+        "title": "Summer Campaign",
+        "image_url": "https://example.com/banner.jpg",
+        "status": "draft",
+        "created_at": "2026-05-21T22:04:38.296123",
+        "updated_at": "2026-05-21T22:04:38.296123"
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Top Products
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.796194
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "items": [
+        {
+          "id": 1,
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 2,
+          "sales": 6,
+          "category": null,
+          "created_at": "2026-05-21T22:00:57.712192",
+          "updated_at": "2026-05-21T22:20:57.752597"
+        },
+        {
+          "id": 2,
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "sales": 0,
+          "category": "Mugs",
+          "created_at": "2026-05-21T22:06:15.109672",
+          "updated_at": "2026-05-21T22:06:15.109672"
+        },
+        {
+          "id": 3,
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "sales": 0,
+          "category": "Mugs",
+          "created_at": "2026-05-21T22:20:57.746232",
+          "updated_at": "2026-05-21T22:20:57.746232"
+        }
+      ]
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Inventory Insights
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.797477
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": {
+      "summary": {
+        "total_items": 3,
+        "low_stock_count": 1
+      },
+      "low_stock_items": [
+        {
+          "id": 1,
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 2,
+          "sales": 6,
+          "category": null,
+          "created_at": "2026-05-21T22:00:57.712192",
+          "updated_at": "2026-05-21T22:20:57.752597"
+        }
+      ]
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Replay Events
+STATUS: PASS
+TIME: 2026-05-21T22:20:57.798795
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "event": "created",
+        "group": "store",
+        "description": "Store created: Coffee Lab"
+      },
+      {
+        "id": 2,
+        "event": "created",
+        "group": "product",
+        "description": "Product created: Premium Mug"
+      },
+      {
+        "id": 3,
+        "event": "created",
+        "group": "order",
+        "description": "Order created #1"
+      },
+      {
+        "id": 4,
+        "event": "updated",
+        "group": "stock",
+        "description": "Stock updated for item #1"
+      },
+      {
+        "id": 5,
+        "event": "created",
+        "group": "banner",
+        "description": "Banner created: Summer Campaign"
+      },
+      {
+        "id": 6,
+        "event": "created",
+        "group": "store",
+        "description": "Store created: Coffee Lab"
+      },
+      {
+        "id": 7,
+        "event": "created",
+        "group": "product",
+        "description": "Product created: Premium Mug"
+      },
+      {
+        "id": 8,
+        "event": "created",
+        "group": "order",
+        "description": "Order created #2"
+      },
+      {
+        "id": 9,
+        "event": "updated",
+        "group": "stock",
+        "description": "Stock updated for item #1"
+      },
+      {
+        "id": 10,
+        "event": "created",
+        "group": "banner",
+        "description": "Banner created: Summer Campaign"
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: NDJSON Stream
+STATUS: PASS
+TIME: 2026-05-21T22:20:58.001007
+RESPONSE:
+{
+  "stream_preview": [
+    {
+      "id": 1,
+      "event": "created",
+      "group": "store",
+      "description": "Store created: Coffee Lab",
+      "ts": "2026-05-21T22:00:50.173315"
+    },
+    {
+      "id": 2,
+      "event": "created",
+      "group": "product",
+      "description": "Product created: Premium Mug",
+      "ts": "2026-05-21T22:00:57.800642"
+    },
+    {
+      "id": 3,
+      "event": "created",
+      "group": "order",
+      "description": "Order created #1",
+      "ts": "2026-05-21T22:01:07.476203"
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Low Stock Trigger
+STATUS: PASS
+TIME: 2026-05-21T22:20:58.007930
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "success": true
+  }
+}
+
+--------------------------------------------------------------------------------
+
+TEST: Timeline After Low Stock
+STATUS: PASS
+TIME: 2026-05-21T22:20:59.010437
+RESPONSE:
+{
+  "status_code": 200,
+  "data": {
+    "data": [
+      {
+        "id": 17,
+        "ts": "2026-05-21T22:20:58.005280",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Manual stock update for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 2,
+            "to": 4
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 4
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 16,
+        "ts": "2026-05-21T22:20:57.789375",
+        "event": "created",
+        "event_label": "Created",
+        "group": "banner",
+        "group_label": "Banners",
+        "description": "Banner created: Summer Campaign",
+        "store_id": 1,
+        "subject": {
+          "type": "Banner",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "title": "Summer Campaign",
+          "image_url": "https://example.com/banner.jpg"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 15,
+        "ts": "2026-05-21T22:20:57.757123",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #1",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 1
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 4,
+            "to": 2
+          }
+        },
+        "payload": {
+          "item_id": 1,
+          "new_stock": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 14,
+        "ts": "2026-05-21T22:20:57.754852",
+        "event": "created",
+        "event_label": "Created",
+        "group": "order",
+        "group_label": "Orders",
+        "description": "Order created #3",
+        "store_id": 1,
+        "subject": {
+          "type": "Order",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "item_id": 1,
+          "quantity": 2
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 13,
+        "ts": "2026-05-21T22:20:57.748494",
+        "event": "created",
+        "event_label": "Created",
+        "group": "product",
+        "group_label": "Products",
+        "description": "Product created: Premium Mug",
+        "store_id": 1,
+        "subject": {
+          "type": "Item",
+          "id": 3
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 1,
+          "name": "Premium Mug",
+          "price": 299.0,
+          "stock": 50,
+          "category": "Mugs"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      }
+    ],
+    "pagination": {
+      "count": 5,
+      "limit": 5,
+      "direction": "desc",
+      "next_cursor": 13,
+      "has_more": true
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+

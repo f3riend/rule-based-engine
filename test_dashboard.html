@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Orchestration Test Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold text-indigo-300">AI Orchestration Sandbox</h1>
+        <p class="text-sm text-slate-400">Internal testing dashboard — multi-tenant rules</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <label class="text-sm text-slate-400">Tenant user_id</label>
+        <input id="userId" type="number" value="1" min="1"
+          class="w-20 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm" />
+        <button id="refreshAll"
+          class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded text-sm font-medium">
+          Refresh All
+        </button>
+        <span id="status" class="text-xs text-slate-500"></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Rule Management -->
+    <section class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-4">Rule Management (NL → DB → Cache)</h2>
+      <textarea id="nlInput" rows="4" placeholder="When a store is created, create an instagram launch post after 3 days..."
+        class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm mb-3"></textarea>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button id="previewBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-sm">Preview DSL</button>
+        <button id="applyBtn" class="bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded text-sm">Apply to DB</button>
+        <button id="importBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-sm">Import rules.txt</button>
+        <button id="exportBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded text-sm">Export rules.txt</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h3 class="text-sm font-medium text-slate-400 mb-2">DSL Preview</h3>
+          <pre id="dslPreview" class="bg-slate-950 border border-slate-800 rounded p-3 text-xs overflow-auto max-h-48 text-emerald-300">—</pre>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-slate-400 mb-2">Current Rules (DB)</h3>
+          <div id="rulesList" class="bg-slate-950 border border-slate-800 rounded p-3 text-xs overflow-auto max-h-48 space-y-2">Loading…</div>
+        </div>
+      </div>
+      <pre id="ruleResult" class="mt-3 bg-slate-950 border border-slate-800 rounded p-3 text-xs overflow-auto max-h-32 text-amber-200 hidden"></pre>
+    </section>
+
+    <!-- Fake Event Generator -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-4">Fake Event Generator</h2>
+      <div class="grid grid-cols-2 gap-2">
+        <button data-event="store" class="event-btn bg-violet-800 hover:bg-violet-700 py-3 rounded text-sm">Create Store</button>
+        <button data-event="product" class="event-btn bg-violet-800 hover:bg-violet-700 py-3 rounded text-sm">Create Product</button>
+        <button data-event="order" class="event-btn bg-violet-800 hover:bg-violet-700 py-3 rounded text-sm">Create Order</button>
+        <button data-event="lowstock" class="event-btn bg-rose-800 hover:bg-rose-700 py-3 rounded text-sm">Low Stock Event</button>
+      </div>
+      <pre id="eventResult" class="mt-3 bg-slate-950 border border-slate-800 rounded p-3 text-xs overflow-auto max-h-32 text-slate-300">—</pre>
+    </section>
+
+    <!-- Cache Stats -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-4">Rule Cache</h2>
+      <pre id="cacheStats" class="bg-slate-950 border border-slate-800 rounded p-3 text-xs overflow-auto max-h-40">—</pre>
+    </section>
+
+    <!-- Timeline -->
+    <section class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-indigo-300">Timeline Viewer</h2>
+        <label class="text-xs text-slate-400 flex items-center gap-2">
+          <input id="autoRefresh" type="checkbox" checked class="rounded" />
+          Auto-refresh (5s)
+        </label>
+      </div>
+      <div id="timeline" class="overflow-auto max-h-64 space-y-2 text-sm">Loading…</div>
+    </section>
+
+    <!-- Workflows -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-4">Workflows</h2>
+      <div id="workflows" class="overflow-auto max-h-72 space-y-2 text-sm">Loading…</div>
+    </section>
+
+    <!-- AI Tasks -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-4">AI Tasks</h2>
+      <div id="tasks" class="overflow-auto max-h-72 space-y-2 text-sm">Loading…</div>
+    </section>
+
+    <!-- Tool Executions -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-4">Tool Executions</h2>
+      <div id="tools" class="overflow-auto max-h-72 space-y-2 text-sm">Loading…</div>
+    </section>
+
+    <!-- Automation Logs -->
+    <section class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-indigo-300 mb-4">Automation Logs</h2>
+      <div id="logs" class="overflow-auto max-h-72 space-y-2 text-sm">Loading…</div>
+    </section>
+
+  </main>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    let refreshTimer = null;
+
+    function uid() {
+      return parseInt(document.getElementById('userId').value, 10) || 1;
+    }
+
+    function setStatus(msg, ok = true) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = ok ? 'text-xs text-emerald-400' : 'text-xs text-rose-400';
+    }
+
+    async function api(path, options = {}) {
+      const url = API + path;
+      const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail ? JSON.stringify(data.detail) : res.statusText);
+      return data;
+    }
+
+    async function loadRules() {
+      const data = await api(`/api/internal/rules?user_id=${uid()}`);
+      const list = document.getElementById('rulesList');
+      if (!data.data.length) {
+        list.innerHTML = '<span class="text-slate-500">No rules in DB</span>';
+        return;
+      }
+      list.innerHTML = data.data.map(r => `
+        <div class="border-b border-slate-800 pb-2">
+          <div class="font-medium text-indigo-200">${r.rule_name} ${r.enabled ? '' : '(disabled)'}</div>
+          <div class="text-slate-500">id=${r.id} · ${r.updated_at}</div>
+          <pre class="text-emerald-400/80 mt-1 whitespace-pre-wrap">${escapeHtml(r.dsl || '')}</pre>
+        </div>
+      `).join('');
+    }
+
+    async function loadCache() {
+      const data = await api('/api/internal/cache-stats');
+      document.getElementById('cacheStats').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function loadTimeline() {
+      const data = await api('/api/internal/timeline?limit=15');
+      const el = document.getElementById('timeline');
+      const events = data.data || [];
+      if (!events.length) {
+        el.innerHTML = '<span class="text-slate-500">No events</span>';
+        return;
+      }
+      el.innerHTML = events.map(e => `
+        <div class="flex gap-3 border-b border-slate-800 pb-2">
+          <span class="text-slate-500 shrink-0">#${e.id}</span>
+          <span class="text-violet-300">${e.group}.${e.event}</span>
+          <span class="text-slate-400 truncate">${e.description || ''}</span>
+        </div>
+      `).join('');
+    }
+
+    async function loadWorkflows() {
+      const data = await api(`/api/internal/workflows?user_id=${uid()}&limit=30`);
+      const el = document.getElementById('workflows');
+      const rows = data.data || [];
+      if (!rows.length) { el.innerHTML = '<span class="text-slate-500">None</span>'; return; }
+      el.innerHTML = rows.map(w => `
+        <div class="border-b border-slate-800 pb-2">
+          <span class="font-medium">#${w.id}</span>
+          <span class="ml-2 px-2 py-0.5 rounded text-xs ${statusColor(w.status)}">${w.status}</span>
+          <div class="text-slate-400">${w.workflow_name} · ${w.entity_type}#${w.entity_id}</div>
+        </div>
+      `).join('');
+    }
+
+    async function loadTasks() {
+      const data = await api(`/api/internal/tasks?user_id=${uid()}&limit=30`);
+      const el = document.getElementById('tasks');
+      const rows = data.data || [];
+      if (!rows.length) { el.innerHTML = '<span class="text-slate-500">None</span>'; return; }
+      el.innerHTML = rows.map(t => `
+        <div class="border-b border-slate-800 pb-2">
+          <span class="font-medium">#${t.id}</span>
+          <span class="ml-2 px-2 py-0.5 rounded text-xs ${statusColor(t.status)}">${t.status}</span>
+          <div class="text-slate-400">${t.task_type} · ${t.entity_type}#${t.entity_id}</div>
+        </div>
+      `).join('');
+    }
+
+    async function loadTools() {
+      const data = await api('/api/internal/tool-executions?limit=25');
+      const el = document.getElementById('tools');
+      const rows = data.data || [];
+      if (!rows.length) { el.innerHTML = '<span class="text-slate-500">None</span>'; return; }
+      el.innerHTML = rows.map(t => `
+        <div class="border-b border-slate-800 pb-2">
+          <span class="font-medium text-amber-300">${t.tool_name}</span>
+          <span class="ml-2 text-xs ${statusColor(t.status)}">${t.status}</span>
+          <span class="ml-2 text-slate-500">${t.duration_ms}ms</span>
+          <div class="text-slate-500">task #${t.task_id}</div>
+        </div>
+      `).join('');
+    }
+
+    async function loadLogs() {
+      const data = await api(`/api/internal/automation-logs?user_id=${uid()}&limit=25`);
+      const el = document.getElementById('logs');
+      const rows = data.data || [];
+      if (!rows.length) { el.innerHTML = '<span class="text-slate-500">None</span>'; return; }
+      el.innerHTML = rows.map(l => `
+        <div class="border-b border-slate-800 pb-2">
+          <span class="font-medium">${l.rule_name || '—'}</span>
+          <span class="ml-2 text-xs">${l.execution_status}</span>
+          <div class="text-slate-500 text-xs truncate">${l.ai_decision || ''}</div>
+        </div>
+      `).join('');
+    }
+
+    function statusColor(s) {
+      if (s === 'completed' || s === 'success') return 'bg-emerald-900 text-emerald-300';
+      if (s === 'running' || s === 'pending' || s === 'scheduled') return 'bg-amber-900 text-amber-300';
+      if (s === 'failed' || s === 'cancelled') return 'bg-rose-900 text-rose-300';
+      return 'bg-slate-800 text-slate-300';
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    async function refreshAll() {
+      setStatus('Refreshing…');
+      try {
+        await Promise.all([
+          loadRules(), loadCache(), loadTimeline(),
+          loadWorkflows(), loadTasks(), loadTools(), loadLogs(),
+        ]);
+        setStatus('Updated ' + new Date().toLocaleTimeString());
+      } catch (e) {
+        setStatus('Error: ' + e.message, false);
+      }
+    }
+
+    document.getElementById('previewBtn').onclick = async () => {
+      const nl = document.getElementById('nlInput').value.trim();
+      if (!nl) return;
+      try {
+        const r = await api('/api/internal/rules/preview', {
+          method: 'POST',
+          body: JSON.stringify({ natural_language: nl, user_id: uid() }),
+        });
+        document.getElementById('dslPreview').textContent = r.dsl_preview || '—';
+        const out = document.getElementById('ruleResult');
+        out.classList.remove('hidden');
+        out.textContent = JSON.stringify(r, null, 2);
+        setStatus('Preview OK');
+      } catch (e) { setStatus(e.message, false); }
+    };
+
+    document.getElementById('applyBtn').onclick = async () => {
+      const nl = document.getElementById('nlInput').value.trim();
+      if (!nl) return;
+      try {
+        const r = await api('/api/internal/rules/apply', {
+          method: 'POST',
+          body: JSON.stringify({ natural_language: nl, user_id: uid() }),
+        });
+        document.getElementById('dslPreview').textContent = 'Applied';
+        document.getElementById('ruleResult').classList.remove('hidden');
+        document.getElementById('ruleResult').textContent = JSON.stringify(r, null, 2);
+        await loadRules();
+        await loadCache();
+        setStatus('Rules applied to DB');
+      } catch (e) { setStatus(e.message, false); }
+    };
+
+    document.getElementById('importBtn').onclick = async () => {
+      try {
+        const r = await api(`/api/internal/rules/import-file?user_id=${uid()}`, { method: 'POST' });
+        setStatus(`Imported ${r.imported} rules`);
+        await loadRules();
+        await loadCache();
+      } catch (e) { setStatus(e.message, false); }
+    };
+
+    document.getElementById('exportBtn').onclick = async () => {
+      try {
+        const r = await api(`/api/internal/rules/export-file?user_id=${uid()}`, { method: 'POST' });
+        document.getElementById('dslPreview').textContent = r.content || '—';
+        setStatus('Exported to rules.txt');
+      } catch (e) { setStatus(e.message, false); }
+    };
+
+    document.querySelectorAll('.event-btn').forEach(btn => {
+      btn.onclick = async () => {
+        const type = btn.dataset.event;
+        try {
+          let res;
+          if (type === 'store') {
+            res = await fetch('/internal/create-store', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: 'Dash Store ' + Date.now()%1000, owner: 'Tester' }),
+            });
+          } else if (type === 'product') {
+            res = await fetch('/internal/create-product', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ store_id: 1, name: 'Dash Mug', price: 19.99, stock: 50 }),
+            });
+          } else if (type === 'order') {
+            res = await fetch('/internal/create-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ store_id: 1, item_id: 1, quantity: 2 }),
+            });
+          } else if (type === 'lowstock') {
+            res = await fetch('/internal/update-stock?item_id=1&stock=4', { method: 'POST' });
+          }
+          const data = await res.json();
+          document.getElementById('eventResult').textContent = JSON.stringify(data, null, 2);
+          setStatus('Event created');
+          setTimeout(refreshAll, 800);
+        } catch (e) { setStatus(e.message, false); }
+      };
+    });
+
+    document.getElementById('refreshAll').onclick = refreshAll;
+    document.getElementById('userId').onchange = refreshAll;
+
+    function setupAutoRefresh() {
+      // Auto-refresh devre dışı bırakıldı — kullanıcı yazarken/test ederken
+      // sayfa kendiliğinden yenilenmesin. Refresh yalnızca manuel buton ile.
+      if (refreshTimer) clearInterval(refreshTimer);
+    }
+    document.getElementById('autoRefresh').onchange = setupAutoRefresh;
+
+    refreshAll();
+  </script>
+</body>
+</html>

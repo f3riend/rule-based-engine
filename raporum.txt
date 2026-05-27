@@ -1,0 +1,3149 @@
+================================================================================
+AI İŞLETİM SİSTEMİ — TAM ENTEGRASYON TEST SONUÇLARI
+================================================================================
+
+Başlangıç       : 2026-05-22 07:06:47
+Bitiş           : 2026-05-22 07:07:12
+Base URL        : http://127.0.0.1:8000
+Kullanıcı ID    : 1
+Yerel orkestr.  : True
+Döngü sayısı    : 10
+
+--- ORKESTRASYON ÖZETİ ---
+Mağaza ID         : 11
+Ürün ID           : 5
+Sipariş ID        : 5
+Banner ID         : 5
+Kampanya ID       : 5
+Yerel döngü çalıştı: evet
+Timeline          : 62 → 76
+İş akışları       : 14 → 15
+AI görevleri      : 13 → 14
+Planlayıcı öneri  : 0 → 0
+
+================================================================================
+TEST DETAYLARI
+================================================================================
+
+--------------------------------------------------------------------------------
+TEST #1: Sağlık kontrolü
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.538931
+DETAY  : API ayakta
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/ai/v1/health
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": {
+      "ok": true,
+      "server_time": "2026-05-22T04:06:47.538674",
+      "agent": {
+        "id": 1,
+        "name": "Fake AI Agent",
+        "status": "active"
+      },
+      "token": {
+        "scope": "admin",
+        "rate_limit_per_min": 999
+      }
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #2: Mağaza oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.548114
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-store
+  HTTP 200 (9 ms)
+  Gövde:
+    {
+      "name": "Sanat Atölyesi Mağaza-4706",
+      "owner": "Test Sahibi",
+      "instagram": "@testshop"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 11
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #3: Ürün oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.554254
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-product
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "store_id": 11,
+      "name": "Deri Cüzdan",
+      "price": 348.52,
+      "stock": 37,
+      "category": "genel"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 5
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #4: Sipariş oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.569304
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-order
+  HTTP 200 (14 ms)
+  Gövde:
+    {
+      "store_id": 11,
+      "item_id": 5,
+      "quantity": 3
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 5,
+      "order_event_id": 65,
+      "stock_event_id": 66
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #5: Stok güncelleme (düşük stok)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.574955
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-stock
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "item_id": 5,
+      "stock": 6
+    }
+
+YANIT:
+  {
+    "success": true
+  }
+
+--------------------------------------------------------------------------------
+TEST #6: İndirim uygulama
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.580667
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-discount
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "item_id": 5,
+      "discount": 29,
+      "store_id": 11
+    }
+
+YANIT:
+  {
+    "success": true,
+    "discount": 29.0,
+    "new_price": 247.45
+  }
+
+--------------------------------------------------------------------------------
+TEST #7: Olumlu yorum oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.585829
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-review
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "store_id": 11,
+      "item_id": 5,
+      "author": "Ayşe K.",
+      "rating": 5.0,
+      "comment": "Beklentimin üzerinde kalite."
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 9
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #8: Olumsuz yorum oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.592149
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-review
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "store_id": 11,
+      "item_id": 5,
+      "author": "Mehmet Y.",
+      "rating": 1.0,
+      "comment": "Kalite fotoğraftaki gibi değil.",
+      "sentiment": "negative"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 10
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #9: Müşteri sorusu oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.598510
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-question
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "store_id": 11,
+      "item_id": 5,
+      "author": "Zeynep",
+      "question": "Beden tablosu var mı?"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 5
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #10: Kampanya başlatma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.604721
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-campaign
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "store_id": 11,
+      "name": "Kampanya Yaz-7134",
+      "campaign_type": "promotion",
+      "discount_pct": 27
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 5
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #11: Satış metrik güncelleme
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.610365
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-sales
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "item_id": 5,
+      "sales_change_pct": -23.361600313799308
+    }
+
+YANIT:
+  {
+    "success": true,
+    "sales": 2
+  }
+
+--------------------------------------------------------------------------------
+TEST #12: Kargo gecikmesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.616041
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/shipping-delay
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "order_id": 5,
+      "delay_days": 3,
+      "reason": "Depo yoğunluğu — entegrasyon testi"
+    }
+
+YANIT:
+  {
+    "success": true,
+    "order_id": 5
+  }
+
+--------------------------------------------------------------------------------
+TEST #13: Banner oluşturma (AI API)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.621901
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/ai/v1/banners
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "store_id": 11,
+      "title": "Banner Promo-3347",
+      "image_url": "https://example.com/banner.jpg"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 5
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #14: Banner performans güncelleme
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:06:47.627388
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-banner-performance
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "banner_id": 5,
+      "ctr": 0.142,
+      "impressions": 6174,
+      "clicks": 74
+    }
+
+YANIT:
+  {
+    "success": true
+  }
+
+--------------------------------------------------------------------------------
+TEST #15: Yerel orkestrasyon döngüsü
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:11.648804
+DETAY  : 2 olay işlendi, 10 döngü tamamlandı
+
+--------------------------------------------------------------------------------
+TEST #16: Zaman tüneli listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.752661
+DETAY  : 50 olay, gruplar: banner, campaign, customer, order, product, review, sales, shipping, stock, store
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/timeline?limit=50
+  HTTP 200 (2 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 76,
+        "ts": "2026-05-22T04:06:47.624958",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "banner",
+        "group_label": "Banners",
+        "description": "Banner performans güncellendi CTR=14.20%",
+        "store_id": 11,
+        "subject": {
+          "type": "Banner",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "ctr": {
+            "from": 0,
+            "to": 0.142
+          }
+        },
+        "payload": {
+          "ctr": 0.142,
+          "click_rate": 0.142,
+          "impressions": 6174,
+          "clicks": 74
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 75,
+        "ts": "2026-05-22T04:06:47.619319",
+        "event": "created",
+        "event_label": "Created",
+        "group": "banner",
+        "group_label": "Banners",
+        "description": "Banner created: Banner Promo-3347",
+        "store_id": 11,
+        "subject": {
+          "type": "Banner",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "store_id": 11,
+          "title": "Banner Promo-3347",
+          "image_url": "https://example.com/banner.jpg"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 74,
+        "ts": "2026-05-22T04:06:47.613405",
+        "event": "delayed",
+        "event_label": "delayed",
+        "group": "shipping",
+        "group_label": "shipping",
+        "description": "Sipariş #5 gecikti: Depo yoğunluğu — entegrasyon testi",
+        "store_id": 11,
+        "subject": {
+          "type": "Order",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "delay_days": 3,
+          "reason": "Depo yoğunluğu — entegrasyon testi",
+          "shipping_delay": 3
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 73,
+        "ts": "2026-05-22T04:06:47.607759",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "sales",
+        "group_label": "sales",
+        "description": "Satış güncellendi: %-23.361600313799308 değişim",
+        "store_id": 11,
+        "subject": {
+          "type": "Item",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "sales": {
+            "from": 3,
+            "to": 2
+          }
+        },
+        "payload": {
+          "sales_change_pct": -23.361600313799308,
+          "sales": 2,
+          "item_id": 5
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 72,
+        "ts": "2026-05-22T04:06:47.601491",
+        "event": "created",
+        "event_label": "Created",
+        "group": "campaign",
+        "group_label": "campaign",
+        "description": "Kampanya başlatıldı: Kampanya Yaz-7134 (%27.0)",
+        "store_id": 11,
+        "subject": {
+          "type": "Campaign",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "name": "Kampanya Yaz-7134",
+          "discount_pct": 27.0,
+          "campaign_type": "promotion"
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 71,
+        "ts": "2026-05-22T04:06:47.595164",
+        "event": "created",
+        "event_label": "Created",
+        "group": "customer",
+        "group_label": "customer",
+        "description": "Müşteri sorusu: Beden tablosu var mı?",
+        "store_id": 11,
+        "subject": {
+          "type": "Question",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "question": "Beden tablosu var mı?",
+          "item_id": 5
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 70,
+        "ts": "2026-05-22T04:06:47.588800",
+        "event": "negative",
+        "event_label": "negative",
+        "group": "review",
+        "group_label": "review",
+        "description": "Yorum: 1.0/5 — Kalite fotoğraftaki gibi değil.",
+        "store_id": 11,
+        "subject": {
+          "type": "Review",
+          "id": 10
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "rating": 1.0,
+          "comment": "Kalite fotoğraftaki gibi değil.",
+          "sentiment": "negative",
+          "item_id": 5
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 69,
+        "ts": "2026-05-22T04:06:47.583513",
+        "event": "created",
+        "event_label": "Created",
+        "group": "review",
+        "group_label": "review",
+        "description": "Yorum: 5.0/5 — Beklentimin üzerinde kalite.",
+        "store_id": 11,
+        "subject": {
+          "type": "Review",
+          "id": 9
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {},
+        "payload": {
+          "rating": 5.0,
+          "comment": "Beklentimin üzerinde kalite.",
+          "sentiment": "positive",
+          "item_id": 5
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 68,
+        "ts": "2026-05-22T04:06:47.578220",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "product",
+        "group_label": "Products",
+        "description": "İndirim uygulandı: %29.0 — Deri Cüzdan",
+        "store_id": 11,
+        "subject": {
+          "type": "Item",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "price": {
+            "from": 348.52,
+            "to": 247.45
+          },
+          "discount": {
+            "from": 0,
+            "to": 29.0
+          }
+        },
+        "payload": {
+          "item_id": 5,
+          "name": "Deri Cüzdan",
+          "discount": 29.0,
+          "discount_percent": 29.0,
+          "price": 247.45
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 67,
+        "ts": "2026-05-22T04:06:47.572441",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Manual stock update for item #5",
+        "store_id": 11,
+        "subject": {
+          "type": "Item",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 34,
+            "to": 6
+          }
+        },
+        "payload": {
+          "item_id": 5,
+          "new_stock": 6
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 66,
+        "ts": "2026-05-22T04:06:47.560077",
+        "event": "updated",
+        "event_label": "Updated",
+        "group": "stock",
+        "group_label": "Stocks",
+        "description": "Stock updated for item #5",
+        "store_id": 11,
+        "subject": {
+          "type": "Item",
+          "id": 5
+        },
+        "causer": {
+          "type": "system",
+          "id": 1,
+          "name": "Fake API"
+        },
+        "changes": {
+          "stock": {
+            "from": 37,
+            "to": 34
+          }
+        },
+        "payload": {
+          "item_id": 5,
+          "new_stock": 34
+        },
+        "meta": {
+          "processed_by_rule_engine": false
+        }
+      },
+      {
+        "id": 65,
+        "ts": "2026-05-22T04:06:47.557563",
+        "event": "created",
+        "event_label": "Created",
+        "group": "order",
+        "group_label": "Orders",
+        "description": "Order created #5",
+        "store_id": 11,
+        "subject": {
+          "type": "Order",
+          "id": 5
+        },
+        "causer": {
+          "type": 
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #17: Timeline olay artışı
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.752705
+DETAY  : önce=62 sonra=76
+
+--------------------------------------------------------------------------------
+TEST #18: İş akışı listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.754376
+DETAY  : 15 iş akışı, örnek: welcome_instagram_post, growth_marketing_campaign, welcome_instagram_post, growth_marketing_campaign, welcome_instagram_post
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/workflows?user_id=1&limit=50
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 15,
+        "workflow_name": "welcome_instagram_post",
+        "entity_type": "store",
+        "entity_id": 11,
+        "status": "completed",
+        "scheduled_at": "2026-05-22T04:06:49.475671",
+        "cancelled_reason": null,
+        "created_at": "2026-05-22T04:06:49.475683",
+        "updated_at": "2026-05-22T04:06:49.505859",
+        "user_id": 1,
+        "metadata": {}
+      },
+      {
+        "id": 14,
+        "workflow_name": "growth_marketing_campaign",
+        "entity_type": "store",
+        "entity_id": 4,
+        "status": "completed",
+        "scheduled_at": "2026-05-22T04:06:14.078453",
+        "cancelled_reason": null,
+        "created_at": "2026-05-22T04:06:14.078494",
+        "updated_at": "2026-05-22T04:06:14.497347",
+        "user_id": 1,
+        "metadata": {
+          "plan": {
+            "decision": "create_workflow",
+            "workflow_name": "growth_marketing_campaign",
+            "workflow": "growth_marketing_campaign",
+            "reason": "Banner etkileşim artışı (CTR 13.50%)",
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "priority": "medium",
+            "confidence": 0.77,
+            "requires_approval": false,
+            "source": "autonomous_contextual",
+            "business_intent": "growth_marketing",
+            "delay": 0,
+            "task_type": "autonomous_growth_marketing_campaign",
+            "entity_type": "store",
+            "entity_id": 4,
+            "task_payload": {
+              "goal": "Banner etkileşim artışı (CTR 13.50%)",
+              "business_intent": "growth_marketing",
+              "event": {
+                "id": 62,
+                "name": "banner.updated",
+                "description": "Banner performans güncellendi CTR=13.50%",
+                "group": "banner",
+                "payload": {
+                  "ctr": 0.135,
+                  "click_rate": 0.135,
+                  "impressions": 6578,
+                  "clicks": 751
+                },
+                "changes": {
+                  "ctr": {
+                    "from": 0,
+                    "to": 0.135
+                  }
+                }
+              },
+              "tools": [
+                "banner_generator_tool",
+                "instagram_campaign_tool"
+              ],
+              "platform": "instagram",
+              "bi_summary": "Banner etkileşim artışı (CTR 13.50%)",
+              "agent": {
+                "agent_id": "marketing",
+                "agent_name": "Marketing Agent",
+                "agent_domain": "marketing",
+                "multi_agent_ready": true
+              }
+            },
+            "reasoning": "Bağlam ve 'growth_marketing' niyetine göre 2 araç seçildi",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            },
+            "bi_insights": [
+              "engagement_spike"
+            ],
+            "approval_reason": "Araç onay gerektiriyor: instagram_campaign_tool",
+            "risk_level": "medium",
+            "approved": true
+          },
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "task_type": "autonomous_growth_marketing_campaign",
+          "task_payload": {
+            "goal": "Banner etkileşim artışı (CTR 13.50%)",
+            "business_intent": "growth_marketing",
+            "event": {
+              "id": 62,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=13.50%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.135,
+                "click_rate": 0.135,
+                "impressions": 6578,
+                "clicks": 751
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.135
+                }
+              }
+            },
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "platform": "instagram",
+            "bi_summary": "Banner etkileşim artışı (CTR 13.50%)",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "requires_approval": false,
+          "approved": true,
+          "source": "autonomous_contextual",
+          "business_intent": "growth_marketing",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          }
+        }
+      },
+      {
+        "id": 13,
+        "workflow_name": "welcome_instagram_post",
+        "entity_type": "store",
+        "entity_id": 10,
+        "status": "completed",
+        "scheduled_at": "2026-05-22T04:06:11.377572",
+        "cancelled_reason": null,
+        "created_at": "2026-05-22T04:06:11.377591",
+        "updated_at": "2026-05-22T04:06:12.127419",
+        "user_id": 1,
+        "metadata": {}
+      },
+      {
+        "id": 12,
+        "workflow_name": "growth_marketing_campaign",
+        "entity_type": "store",
+        "entity_id": 3,
+        "status": "completed",
+        "scheduled_at": "2026-05-22T04:04:41.862680",
+        "cancelled_reason": null,
+        "created_at": "2026-05-22T04:04:41.862710",
+        "updated_at": "2026-05-22T04:04:44.487708",
+        "user_id": 1,
+        "metadata": {
+          "plan": {
+            "decision": "create_workflow",
+            "workflow_name": "growth_marketing_campaign",
+            "workflow": "growth_marketing_campaign",
+            "reason": "Banner etkileşim artışı (CTR 8.20%)",
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "priority": "medium",
+            "confidence": 0.664,
+            "requires_approval": false,
+            "source": "autonomous_contextual",
+            "business_intent": "growth_marketing",
+            "delay": 0,
+            "task_type": "autonomous_growth_marketing_campaign",
+            "entity_type": "store",
+            "entity_id": 3,
+            "task_payload": {
+              "goal": "Banner etkileşim artışı (CTR 8.20%)",
+              "business_intent": "growth_marketing",
+              "event": {
+                "id": 48,
+                "name": "banner.updated",
+                "description": "Banner performans güncellendi CTR=8.20%",
+                "group": "banner",
+                "payload": {
+                  "ctr": 0.082,
+                  "click_rate": 0.082,
+                  "impressions": 9196,
+                  "clicks": 172
+                },
+                "changes": {
+                  "ctr": {
+                    "from": 0,
+                    "to": 0.082
+                  }
+                }
+              },
+              "tools": [
+                "banner_generator_tool",
+                "instagram_campaign_tool"
+              ],
+              "platform": "instagram",
+              "bi_summary": "Banner etkileşim artışı (CTR 8.20%)",
+              "agent": {
+                "agent_id": "marketing",
+                "agent_name": "Marketing Agent",
+                "agent_domain": "marketing",
+                "multi_agent_ready": true
+              }
+            },
+            "reasoning": "Bağlam ve 'growth_marketing' niyetine göre 2 araç seçildi",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            },
+            "bi_insights": [
+              "engagement_spike"
+            ],
+            "approval_reason": "Plan düşük güven ile işaretlendi",
+            "risk_level": "medium",
+            "approved": true
+          },
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "task_type": "autonomous_growth_marketing_campaign",
+          "task_payload": {
+            "goal": "Banner etkileşim artışı (CTR 8.20%)",
+            "business_intent": "growth_marketing",
+            "event": {
+              "id": 48,
+              "name
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #19: AI görev listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.755651
+DETAY  : 14 görev, tipler: ['instagram_launch_campaign', 'autonomous_general_marketing_teknoloji_k_esi_ma_aza', 'autonomous_growth_marketing_campaign']
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/tasks?user_id=1&limit=50
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 14,
+        "task_type": "instagram_launch_campaign",
+        "entity_type": "store",
+        "entity_id": 11,
+        "workflow_id": 15,
+        "status": "running",
+        "payload": "{\"store\": {\"id\": 11, \"name\": \"Sanat At\\u00f6lyesi Ma\\u011faza-4706\", \"owner\": \"Test Sahibi\", \"instagram\": \"@testshop\", \"status\": \"active\", \"created_at\": \"2026-05-22T04:06:47.539547\", \"updated_at\": \"2026-05-22T04:06:47.539547\", \"user_id\": 1}, \"goal\": \"Create launch campaign\", \"platform\": \"instagram\"}",
+        "ai_result": null,
+        "selected_tool": null,
+        "retry_count": 3,
+        "error": "Error code: 400 - {'error': {'message': \"Invalid schema for function 'banner_generator_tool': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Extra required key 'title' supplied.\", 'type': 'invalid_request_error', 'param': 'tools[1].function.parameters', 'code': 'invalid_function_parameters'}}",
+        "created_at": "2026-05-22T04:06:49.503449",
+        "updated_at": "2026-05-22T04:07:11.274362",
+        "user_id": 1
+      },
+      {
+        "id": 13,
+        "task_type": "autonomous_growth_marketing_campaign",
+        "entity_type": "store",
+        "entity_id": 4,
+        "workflow_id": 14,
+        "status": "dead_letter",
+        "payload": "{\"goal\": \"Banner etkile\\u015fim art\\u0131\\u015f\\u0131 (CTR 13.50%)\", \"business_intent\": \"growth_marketing\", \"event\": {\"id\": 62, \"name\": \"banner.updated\", \"description\": \"Banner performans g\\u00fcncellendi CTR=13.50%\", \"group\": \"banner\", \"payload\": {\"ctr\": 0.135, \"click_rate\": 0.135, \"impressions\": 6578, \"clicks\": 751}, \"changes\": {\"ctr\": {\"from\": 0, \"to\": 0.135}}}, \"tools\": [\"banner_generator_tool\", \"instagram_campaign_tool\"], \"platform\": \"instagram\", \"bi_summary\": \"Banner etkile\\u015fim art\\u0131\\u015f\\u0131 (CTR 13.50%)\", \"agent\": {\"agent_id\": \"marketing\", \"agent_name\": \"Marketing Agent\", \"agent_domain\": \"marketing\", \"multi_agent_ready\": true}, \"store\": {\"id\": 4, \"name\": \"AI Coffee Store\", \"owner\": \"Oktay\", \"instagram\": null, \"status\": \"active\", \"created_at\": \"2026-05-22T02:20:32.786087\", \"updated_at\": \"2026-05-22T02:20:32.786087\", \"user_id\": 1}, \"workflow_name\": \"growth_marketing_campaign\", \"autonomous\": true}",
+        "ai_result": null,
+        "selected_tool": null,
+        "retry_count": 3,
+        "error": "Error code: 400 - {'error': {'message': \"Invalid schema for function 'banner_generator_tool': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Extra required key 'title' supplied.\", 'type': 'invalid_request_error', 'param': 'tools[0].function.parameters', 'code': 'invalid_function_parameters'}}",
+        "created_at": "2026-05-22T04:06:14.494361",
+        "updated_at": "2026-05-22T04:06:45.290413",
+        "user_id": 1
+      },
+      {
+        "id": 12,
+        "task_type": "instagram_launch_campaign",
+        "entity_type": "store",
+        "entity_id": 10,
+        "workflow_id": 13,
+        "status": "dead_letter",
+        "payload": "{\"store\": {\"id\": 10, \"name\": \"Kahve Lab Ma\\u011faza-3051\", \"owner\": \"Test Sahibi\", \"instagram\": \"@testshop\", \"status\": \"active\", \"created_at\": \"2026-05-22T04:06:11.011905\", \"updated_at\": \"2026-05-22T04:06:11.011905\", \"user_id\": 1}, \"goal\": \"Create launch campaign\", \"platform\": \"instagram\"}",
+        "ai_result": null,
+        "selected_tool": null,
+        "retry_count": 3,
+        "error": "Error code: 400 - {'error': {'message': \"Invalid schema for function 'banner_generator_tool': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Extra required key 'title' supplied.\", 'type': 'invalid_request_error', 'param': 'tools[1].function.parameters', 'code': 'invalid_function_parameters'}}",
+        "created_at": "2026-05-22T04:06:12.125343",
+        "updated_at": "2026-05-22T04:06:37.451149",
+        "user_id": 1
+      },
+      {
+        "id": 11,
+        "task_type": "autonomous_growth_marketing_campaign",
+        "entity_type": "store",
+        "entity_id": 3,
+        "workflow_id": 12,
+        "status": "dead_letter",
+        "payload": "{\"goal\": \"Banner etkile\\u015fim art\\u0131\\u015f\\u0131 (CTR 8.20%)\", \"business_intent\": \"growth_marketing\", \"event\": {\"id\": 48, \"name\": \"banner.updated\", \"description\": \"Banner performans g\\u00fcncellendi CTR=8.20%\", \"group\": \"banner\", \"payload\": {\"ctr\": 0.082, \"click_rate\": 0.082, \"impressions\": 9196, \"clicks\": 172}, \"changes\": {\"ctr\": {\"from\": 0, \"to\": 0.082}}}, \"tools\": [\"banner_generator_tool\", \"instagram_campaign_tool\"], \"platform\": \"instagram\", \"bi_summary\": \"Banner etkile\\u015fim art\\u0131\\u015f\\u0131 (CTR 8.20%)\", \"agent\": {\"agent_id\": \"marketing\", \"agent_name\": \"Marketing Agent\", \"agent_domain\": \"marketing\", \"multi_agent_ready\": true}, \"store\": {\"id\": 3, \"name\": \"Coffee Runtime\", \"owner\": \"Oktay\", \"instagram\": null, \"status\": \"active\", \"created_at\": \"2026-05-22T00:45:59.770851\", \"updated_at\": \"2026-05-22T00:45:59.770851\", \"user_id\": 1}, \"workflow_name\": \"growth_marketing_campaign\", \"autonomous\": true}",
+        "ai_result": null,
+        "selected_tool": null,
+        "retry_count": 3,
+        "error": "Error code: 400 - {'error': {'message': \"Invalid schema for function 'banner_generator_tool': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Extra required key 'title' supplied.\", 'type': 'invalid_request_error', 'param': 'tools[0].function.parameters', 'code': 'invalid_function_parameters'}}",
+        "created_at": "2026-05-22T04:04:44.485444",
+        "updated_at": "2026-05-22T04:05:07.315606",
+        "user_id": 1
+      },
+      {
+        "id": 10,
+        "task_type": "instagram_launch_campaign",
+        "entity_type": "store",
+        "entity_id": 9,
+        "workflow_id": 11,
+        "status": "dead_letter",
+        "payload": "{\"store\": {\"id\": 9, \"name\": \"Teknoloji K\\u00f6\\u015fesi Ma\\u011faza-5167\", \"owner\": \"Test Sahibi\", \"instagram\": \"@testshop\", \"status\": \"active\", \"created_at\": \"2026-05-22T04:04:15.202416\", \"updated_at\": \"2026-05-22T04:04:15.202416\", \"user_id\": 1}, \"goal\": \"Create launch campaign\", \"platform\": \"instagram\"}",
+        "ai_result": null,
+        "selected_tool": null,
+        "retry_count": 3,
+        "error": "Error code: 400 - {'error': {'message': \"Invalid schema for function 'banner_generator_tool': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Extra required key 'title' supplied.\", 'type': 'invalid_request_error', 'param': 'tools[1].function.parameters', 'code': 'invalid_function_parameters'}}",
+        "created_at": "2026-05-22T04:04:19.319755",
+        "updated_at": "2026-05-22T04:04:41.820767",
+        "user_id": 1
+      },
+      {
+        "id": 9,
+        "task_type": "autonomous_growth_marketing_campaign",
+        "entity_type": "store",
+        "entity_id": 2,
+        "workflow_id": 10,
+        "status": "dead_letter",
+        "payload": "{\"goal\": \"Banner etkile\\u015fim art\\u0131\\u015f\\u0131 (CTR 10.70%)\", \"business_intent\": \"growth_marketing\", \"event\": {\"id\": 34, \"name\": \"banner.updated\", \"description\": \"Banner performans g\\u00fcncellendi CTR=10.70%\", \"group\": \"banner\", \"payload\": {\"ctr\": 0.107, \"click_rate\": 0.107, \"impressions\": 9534, \"clicks\": 634}, \"changes\": {\"ctr\": {\"from\": 0, \"to\": 0.107}}}, \"tools\": [\"banner_generator_tool\", \"instagram_campaign_tool\"], \"platform\": \"instagram\", \"bi_summary\": \"Banner etkile\\u015fim art\\u0131\\u015f\\u0131 (CTR 10.70%)\", \"agent\": {\"agent_id\": \"marketing\", \"agent_name\": \"Marketing Agent\", \"agent_domain\": \"marketing\", \"multi_agent_ready\": true}, \"store\": {\"id\": 2, \"name\": \"Instant Pi
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #20: İş akışı üretimi (orkestrasyon)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.755689
+DETAY  : Δ iş akışı=1, toplam=15
+
+--------------------------------------------------------------------------------
+TEST #21: Kural önizleme (DSL + otonom plan)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.761243
+DETAY  : karar=create_workflow, güven=0.83, araçlar=['instagram_campaign_tool', 'banner_generator_tool']
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/internal/rules/preview
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "user_id": 1,
+      "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+    }
+
+YANIT:
+  {
+    "success": false,
+    "message": "Could not infer rules — clarification needed",
+    "dsl_preview": "",
+    "full_content_preview": "",
+    "conflicts": [],
+    "duplicates": [],
+    "validation": {
+      "valid": false,
+      "errors": [
+        "no_rules_generated_from_natural_language"
+      ]
+    },
+    "generated_rules": [],
+    "semantic": {
+      "confidence": 0.0,
+      "ambiguities": [
+        "No business intent recognized: 'Ürün indirime girince Instagram paylaşımı oluştur.'"
+      ],
+      "missing_thresholds": [],
+      "requires_confirmation": true,
+      "intents_detected": [],
+      "message": "Could not infer rules — clarification needed",
+      "rule_count": 0
+    },
+    "autonomous_plan": {
+      "decision": "create_workflow",
+      "workflow_name": "discount_promotion_campaign",
+      "workflow": "discount_promotion_campaign",
+      "reason": "Kullanıcı niyeti: sosyal medya içeriği",
+      "tools": [
+        "instagram_campaign_tool",
+        "banner_generator_tool"
+      ],
+      "priority": "high",
+      "confidence": 0.828,
+      "requires_approval": true,
+      "source": "autonomous_contextual",
+      "business_intent": "discount_promotion",
+      "delay": 0,
+      "task_type": "autonomous_discount_promotion_campaign",
+      "entity_type": "store",
+      "entity_id": 1,
+      "task_payload": {
+        "goal": "Kullanıcı niyeti: sosyal medya içeriği",
+        "business_intent": "discount_promotion",
+        "event": {
+          "id": 0,
+          "name": "intent.user_rule",
+          "description": "Ürün indirime girince Instagram paylaşımı oluştur.",
+          "group": "intent",
+          "payload": {
+            "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+          },
+          "changes": {}
+        },
+        "tools": [
+          "instagram_campaign_tool",
+          "banner_generator_tool"
+        ],
+        "platform": "instagram",
+        "bi_summary": "Kullanıcı niyeti: sosyal medya içeriği; Kullanıcı niyeti: promosyon / indirim",
+        "agent": {
+          "agent_id": "marketing",
+          "agent_name": "Marketing Agent",
+          "agent_domain": "marketing",
+          "multi_agent_ready": true
+        }
+      },
+      "reasoning": "Bağlam ve 'discount_promotion' niyetine göre 2 araç seçildi",
+      "agent": {
+        "agent_id": "marketing",
+        "agent_name": "Marketing Agent",
+        "agent_domain": "marketing",
+        "multi_agent_ready": true
+      },
+      "bi_insights": [
+        "campaign_opportunity",
+        "campaign_opportunity"
+      ],
+      "approval_reason": "Araç onay gerektiriyor: instagram_campaign_tool",
+      "risk_level": "medium"
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #22: Otonom plan önizleme
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.762879
+DETAY  : plan=discount_promotion_campaign
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/internal/rules/preview-autonomous
+  HTTP 200 (1 ms)
+  Gövde:
+    {
+      "user_id": 1,
+      "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+    }
+
+YANIT:
+  {
+    "success": true,
+    "plan": {
+      "decision": "create_workflow",
+      "workflow_name": "discount_promotion_campaign",
+      "workflow": "discount_promotion_campaign",
+      "reason": "Kullanıcı niyeti: sosyal medya içeriği",
+      "tools": [
+        "instagram_campaign_tool",
+        "banner_generator_tool"
+      ],
+      "priority": "high",
+      "confidence": 0.828,
+      "requires_approval": true,
+      "source": "autonomous_contextual",
+      "business_intent": "discount_promotion",
+      "delay": 0,
+      "task_type": "autonomous_discount_promotion_campaign",
+      "entity_type": "store",
+      "entity_id": 1,
+      "task_payload": {
+        "goal": "Kullanıcı niyeti: sosyal medya içeriği",
+        "business_intent": "discount_promotion",
+        "event": {
+          "id": 0,
+          "name": "intent.user_rule",
+          "description": "Ürün indirime girince Instagram paylaşımı oluştur.",
+          "group": "intent",
+          "payload": {
+            "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+          },
+          "changes": {}
+        },
+        "tools": [
+          "instagram_campaign_tool",
+          "banner_generator_tool"
+        ],
+        "platform": "instagram",
+        "bi_summary": "Kullanıcı niyeti: sosyal medya içeriği; Kullanıcı niyeti: promosyon / indirim",
+        "agent": {
+          "agent_id": "marketing",
+          "agent_name": "Marketing Agent",
+          "agent_domain": "marketing",
+          "multi_agent_ready": true
+        }
+      },
+      "reasoning": "Bağlam ve 'discount_promotion' niyetine göre 2 araç seçildi",
+      "agent": {
+        "agent_id": "marketing",
+        "agent_name": "Marketing Agent",
+        "agent_domain": "marketing",
+        "multi_agent_ready": true
+      },
+      "bi_insights": [
+        "campaign_opportunity",
+        "campaign_opportunity"
+      ],
+      "approval_reason": "Araç onay gerektiriyor: instagram_campaign_tool",
+      "risk_level": "medium"
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #23: Planlayıcı önerileri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.766084
+DETAY  : 19 öneri, uygulanan=19
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/proposals?user_id=1&limit=30
+  HTTP 200 (2 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 19,
+        "event_id": 76,
+        "event_name": "banner.updated",
+        "entity_type": "banner",
+        "entity_id": 5,
+        "applied": 1,
+        "apply_result": "stored:requires_approval#19",
+        "created_at": "2026-05-22T04:06:51.641322",
+        "user_id": 1,
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "growth_marketing_campaign",
+          "workflow": "growth_marketing_campaign",
+          "reason": "Banner etkileşim artışı (CTR 14.20%)",
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.784,
+          "requires_approval": true,
+          "source": "autonomous_contextual",
+          "business_intent": "growth_marketing",
+          "delay": 0,
+          "task_type": "autonomous_growth_marketing_campaign",
+          "entity_type": "store",
+          "entity_id": 5,
+          "task_payload": {
+            "goal": "Banner etkileşim artışı (CTR 14.20%)",
+            "business_intent": "growth_marketing",
+            "event": {
+              "id": 76,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=14.20%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.142,
+                "click_rate": 0.142,
+                "impressions": 6174,
+                "clicks": 74
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.142
+                }
+              }
+            },
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "platform": "instagram",
+            "bi_summary": "Banner etkileşim artışı (CTR 14.20%)",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "reasoning": "Bağlam ve 'growth_marketing' niyetine göre 2 araç seçildi",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "bi_insights": [
+            "engagement_spike"
+          ],
+          "approval_reason": "Araç onay gerektiriyor: instagram_campaign_tool",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 18,
+        "event_id": 75,
+        "event_name": "banner.created",
+        "entity_type": "banner",
+        "entity_id": 5,
+        "applied": 1,
+        "apply_result": "stored:requires_approval#18",
+        "created_at": "2026-05-22T04:06:51.636392",
+        "user_id": 1,
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "general_marketing_campaign",
+          "workflow": "general_marketing_campaign",
+          "reason": "Yeterli iş sinyali bulunamadı",
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "source": "autonomous_contextual",
+          "business_intent": "general_marketing",
+          "delay": 0,
+          "task_type": "autonomous_general_marketing_campaign",
+          "entity_type": "store",
+          "entity_id": 5,
+          "task_payload": {
+            "goal": "Yeterli iş sinyali bulunamadı",
+            "business_intent": "general_marketing",
+            "event": {
+              "id": 75,
+              "name": "banner.created",
+              "description": "Banner created: Banner Promo-3347",
+              "group": "banner",
+              "payload": {
+                "store_id": 11,
+                "title": "Banner Promo-3347",
+                "image_url": "https://example.com/banner.jpg"
+              },
+              "changes": {}
+            },
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "platform": "instagram",
+            "bi_summary": "Belirgin iş sinyali yok",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "reasoning": "Bağlam ve 'general_marketing' niyetine göre 2 araç seçildi",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "bi_insights": [],
+          "approval_reason": "Plan düşük güven ile işaretlendi",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 17,
+        "event_id": 62,
+        "event_name": "banner.updated",
+        "entity_type": "banner",
+        "entity_id": 4,
+        "applied": 1,
+        "apply_result": "stored:requires_approval#17",
+        "created_at": "2026-05-22T04:06:12.121407",
+        "user_id": 1,
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "growth_marketing_campaign",
+          "workflow": "growth_marketing_campaign",
+          "reason": "Banner etkileşim artışı (CTR 13.50%)",
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.77,
+          "requires_approval": true,
+          "source": "autonomous_contextual",
+          "business_intent": "growth_marketing",
+          "delay": 0,
+          "task_type": "autonomous_growth_marketing_campaign",
+          "entity_type": "store",
+          "entity_id": 4,
+          "task_payload": {
+            "goal": "Banner etkileşim artışı (CTR 13.50%)",
+            "business_intent": "growth_marketing",
+            "event": {
+              "id": 62,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=13.50%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.135,
+                "click_rate": 0.135,
+                "impressions": 6578,
+                "clicks": 751
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.135
+                }
+              }
+            },
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "platform": "instagram",
+            "bi_summary": "Banner etkileşim artışı (CTR 13.50%)",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "reasoning": "Bağlam ve 'growth_marketing' niyetine göre 2 araç seçildi",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "bi_insights": [
+            "engagement_spike"
+          ],
+          "approval_reason": "Araç onay gerektiriyor: instagram_campaign_tool",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 16,
+        "event_id": 61,
+        "event_name": "banner.created",
+        "entity_type": "banner",
+        "entity_id": 4,
+        "applied": 1,
+        "apply_result": "stored:requires_approval#16",
+        "created_at": "2026-05-22T04:06:12.116435",
+        "user_id": 1,
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "general_marketing_campaign",
+          "workflow": "general_marketing_campaign",
+          "reason": "Yeterli iş sinyali bulunamadı",
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "source": "autonomous_contextual",
+          "business_intent": "general_marketing",
+          "delay": 0,
+          "task_type": "autonomous_general_marketing_campaign",
+          "entity_type": "store",
+          "entity_id": 4,
+          
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #24: Planlayıcı öneri üretimi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.766121
+DETAY  : Δ öneri=0, iş akışı Δ=1
+
+--------------------------------------------------------------------------------
+TEST #25: Otomasyon logları
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.767592
+DETAY  : 30 log kaydı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/automation-logs?user_id=1&limit=30
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 34,
+        "event_id": 0,
+        "rule_name": "task:instagram_launch_campaign",
+        "workflow_id": 15,
+        "task_id": 14,
+        "matched": 1,
+        "ai_decision": "ai_task_created for store#11",
+        "selected_tool": null,
+        "tool_input": "{\"task_id\": 14, \"task_type\": \"instagram_launch_campaign\", \"workflow_id\": 15}",
+        "tool_output": "{\"task_id\": 14}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:06:49.504245",
+        "updated_at": "2026-05-22T04:06:49.505116",
+        "user_id": 1
+      },
+      {
+        "id": 33,
+        "event_id": 63,
+        "rule_name": "workflow:welcome_instagram_post",
+        "workflow_id": 15,
+        "task_id": null,
+        "matched": 1,
+        "ai_decision": "workflow_created for store#11",
+        "selected_tool": null,
+        "tool_input": "{\"workflow_id\": 15, \"workflow_name\": \"welcome_instagram_post\", \"entity_type\": \"store\", \"entity_id\": 11}",
+        "tool_output": "{\"workflow_id\": 15}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:06:49.476563",
+        "updated_at": "2026-05-22T04:06:49.477421",
+        "user_id": 1
+      },
+      {
+        "id": 32,
+        "event_id": 0,
+        "rule_name": "task:autonomous_growth_marketing_campaign",
+        "workflow_id": 14,
+        "task_id": 13,
+        "matched": 1,
+        "ai_decision": "ai_task_created for store#4",
+        "selected_tool": null,
+        "tool_input": "{\"task_id\": 13, \"task_type\": \"autonomous_growth_marketing_campaign\", \"workflow_id\": 14}",
+        "tool_output": "{\"task_id\": 13}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:06:14.495263",
+        "updated_at": "2026-05-22T04:06:14.496376",
+        "user_id": 1
+      },
+      {
+        "id": 31,
+        "event_id": 62,
+        "rule_name": "workflow:growth_marketing_campaign",
+        "workflow_id": 14,
+        "task_id": null,
+        "matched": 1,
+        "ai_decision": "workflow_created for store#4",
+        "selected_tool": null,
+        "tool_input": "{\"workflow_id\": 14, \"workflow_name\": \"growth_marketing_campaign\", \"entity_type\": \"store\", \"entity_id\": 4}",
+        "tool_output": "{\"workflow_id\": 14}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:06:14.079452",
+        "updated_at": "2026-05-22T04:06:14.080158",
+        "user_id": 1
+      },
+      {
+        "id": 30,
+        "event_id": 0,
+        "rule_name": "task:instagram_launch_campaign",
+        "workflow_id": 13,
+        "task_id": 12,
+        "matched": 1,
+        "ai_decision": "ai_task_created for store#10",
+        "selected_tool": null,
+        "tool_input": "{\"task_id\": 12, \"task_type\": \"instagram_launch_campaign\", \"workflow_id\": 13}",
+        "tool_output": "{\"task_id\": 12}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:06:12.125978",
+        "updated_at": "2026-05-22T04:06:12.126684",
+        "user_id": 1
+      },
+      {
+        "id": 29,
+        "event_id": 49,
+        "rule_name": "workflow:welcome_instagram_post",
+        "workflow_id": 13,
+        "task_id": null,
+        "matched": 1,
+        "ai_decision": "workflow_created for store#10",
+        "selected_tool": null,
+        "tool_input": "{\"workflow_id\": 13, \"workflow_name\": \"welcome_instagram_post\", \"entity_type\": \"store\", \"entity_id\": 10}",
+        "tool_output": "{\"workflow_id\": 13}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:06:11.378622",
+        "updated_at": "2026-05-22T04:06:11.379578",
+        "user_id": 1
+      },
+      {
+        "id": 28,
+        "event_id": 0,
+        "rule_name": "task:autonomous_growth_marketing_campaign",
+        "workflow_id": 12,
+        "task_id": 11,
+        "matched": 1,
+        "ai_decision": "ai_task_created for store#3",
+        "selected_tool": null,
+        "tool_input": "{\"task_id\": 11, \"task_type\": \"autonomous_growth_marketing_campaign\", \"workflow_id\": 12}",
+        "tool_output": "{\"task_id\": 11}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:04:44.486378",
+        "updated_at": "2026-05-22T04:04:44.487089",
+        "user_id": 1
+      },
+      {
+        "id": 27,
+        "event_id": 48,
+        "rule_name": "workflow:growth_marketing_campaign",
+        "workflow_id": 12,
+        "task_id": null,
+        "matched": 1,
+        "ai_decision": "workflow_created for store#3",
+        "selected_tool": null,
+        "tool_input": "{\"workflow_id\": 12, \"workflow_name\": \"growth_marketing_campaign\", \"entity_type\": \"store\", \"entity_id\": 3}",
+        "tool_output": "{\"workflow_id\": 12}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:04:41.863520",
+        "updated_at": "2026-05-22T04:04:41.864370",
+        "user_id": 1
+      },
+      {
+        "id": 26,
+        "event_id": 0,
+        "rule_name": "task:instagram_launch_campaign",
+        "workflow_id": 11,
+        "task_id": 10,
+        "matched": 1,
+        "ai_decision": "ai_task_created for store#9",
+        "selected_tool": null,
+        "tool_input": "{\"task_id\": 10, \"task_type\": \"instagram_launch_campaign\", \"workflow_id\": 11}",
+        "tool_output": "{\"task_id\": 10}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:04:19.320413",
+        "updated_at": "2026-05-22T04:04:19.321140",
+        "user_id": 1
+      },
+      {
+        "id": 25,
+        "event_id": 35,
+        "rule_name": "workflow:welcome_instagram_post",
+        "workflow_id": 11,
+        "task_id": null,
+        "matched": 1,
+        "ai_decision": "workflow_created for store#9",
+        "selected_tool": null,
+        "tool_input": "{\"workflow_id\": 11, \"workflow_name\": \"welcome_instagram_post\", \"entity_type\": \"store\", \"entity_id\": 9}",
+        "tool_output": "{\"workflow_id\": 11}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T04:04:15.310888",
+        "updated_at": "2026-05-22T04:04:15.311732",
+        "user_id": 1
+      },
+      {
+        "id": 24,
+        "event_id": 0,
+        "rule_name": "task:autonomous_growth_marketing_campaign",
+        "workflow_id": 10,
+        "task_id": 9,
+        "matched": 1,
+        "ai_decision": "ai_task_created for store#2",
+        "selected_tool": null,
+        "tool_input": "{\"task_id\": 9, \"task_type\": \"autonomous_growth_marketing_campaign\", \"workflow_id\": 10}",
+        "tool_output": "{\"task_id\": 9}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T03:49:54.446376",
+        "updated_at": "2026-05-22T03:49:54.447450",
+        "user_id": 1
+      },
+      {
+        "id": 23,
+        "event_id": 34,
+        "rule_name": "workflow:growth_marketing_campaign",
+        "workflow_id": 10,
+        "task_id": null,
+        "matched": 1,
+        "ai_decision": "workflow_created for store#2",
+        "selected_tool": null,
+        "tool_input": "{\"workflow_id\": 10, \"workflow_name\": \"growth_marketing_campaign\", \"entity_type\": \"store\", \"entity_id\": 2}",
+        "tool_output": "{\"workflow_id\": 10}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 0,
+        "created_at": "2026-05-22T03:49:54.101764",
+        "updated_at": "2026-05-22T03:49:54.102625",
+        "user_id": 1
+      },
+      {
+        "id": 22,
+        "event_id": 0,
+        "rule_name": "task:instagram_lau
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #26: Araç çalıştırma logları
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.768473
+DETAY  : 5 araç çalıştırması
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/tool-executions?limit=30
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 5,
+        "task_id": 5,
+        "tool_name": "instagram_campaign_tool",
+        "input_payload": "{\"store_name\": \"Demo Store\"}",
+        "output_payload": "{\"caption\": \"Welcome to Demo Store \\u2615\", \"hashtags\": [\"#coffee\", \"#launch\"]}",
+        "status": "success",
+        "duration_ms": 2000,
+        "error": null,
+        "created_at": "2026-05-22T02:28:50.616130",
+        "task_type": "instagram_launch_campaign",
+        "user_id": 1
+      },
+      {
+        "id": 4,
+        "task_id": 4,
+        "tool_name": "instagram_campaign_tool",
+        "input_payload": "{\"store_name\": \"AI Coffee Store\"}",
+        "output_payload": "{\"caption\": \"Welcome to AI Coffee Store \\u2615\", \"hashtags\": [\"#coffee\", \"#launch\"]}",
+        "status": "success",
+        "duration_ms": 2000,
+        "error": null,
+        "created_at": "2026-05-22T02:22:31.263104",
+        "task_type": "instagram_launch_campaign",
+        "user_id": 1
+      },
+      {
+        "id": 3,
+        "task_id": 3,
+        "tool_name": "instagram_campaign_tool",
+        "input_payload": "{\"store_name\": \"AI Coffee Store\"}",
+        "output_payload": "{\"caption\": \"Welcome to AI Coffee Store \\u2615\", \"hashtags\": [\"#coffee\", \"#launch\"]}",
+        "status": "success",
+        "duration_ms": 2000,
+        "error": null,
+        "created_at": "2026-05-22T02:20:44.811189",
+        "task_type": "instagram_launch_campaign",
+        "user_id": 1
+      },
+      {
+        "id": 2,
+        "task_id": 2,
+        "tool_name": "instagram_campaign_tool",
+        "input_payload": "{\"store_name\": \"Coffee Runtime\"}",
+        "output_payload": "{\"caption\": \"Welcome to Coffee Runtime \\u2615\", \"hashtags\": [\"#coffee\", \"#launch\"]}",
+        "status": "success",
+        "duration_ms": 2000,
+        "error": null,
+        "created_at": "2026-05-22T00:46:07.782791",
+        "task_type": "instagram_launch_campaign",
+        "user_id": 1
+      },
+      {
+        "id": 1,
+        "task_id": 1,
+        "tool_name": "instagram_campaign_tool",
+        "input_payload": "{\"store_name\": \"Instant Pipeline\"}",
+        "output_payload": "{\"caption\": \"Welcome to Instant Pipeline \\u2615\", \"hashtags\": [\"#coffee\", \"#launch\"]}",
+        "status": "success",
+        "duration_ms": 2000,
+        "error": null,
+        "created_at": "2026-05-22T00:16:31.759290",
+        "task_type": "instagram_launch_campaign",
+        "user_id": 1
+      }
+    ]
+  }
+
+--------------------------------------------------------------------------------
+TEST #27: Araç kayıt defteri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.769273
+DETAY  : 3 araç tanımlı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/tools/registry
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "name": "instagram_campaign_tool",
+        "category": "marketing",
+        "description": "Instagram kampanyası, açıklama ve hashtag üretir. İndirim ve lansman paylaşımları.",
+        "capabilities": [
+          "social_post_draft",
+          "caption_generation",
+          "hashtag_suggestions",
+          "discount_announcement"
+        ],
+        "supported_business_intents": [
+          "promotion",
+          "discount",
+          "social_media",
+          "instagram",
+          "launch",
+          "campaign",
+          "virality",
+          "discount_promotion"
+        ],
+        "risk_level": "medium",
+        "requires_approval": true,
+        "success_rate": 1.0
+      },
+      {
+        "name": "banner_generator_tool",
+        "category": "marketing",
+        "description": "Promosyon banner metni ve görsel metadata üretir.",
+        "capabilities": [
+          "banner_copy",
+          "promotional_headline",
+          "cta_generation"
+        ],
+        "supported_business_intents": [
+          "banner",
+          "promotion",
+          "campaign",
+          "discount",
+          "marketing",
+          "banner_campaign"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 0.88
+      },
+      {
+        "name": "low_stock_notification_tool",
+        "category": "inventory",
+        "description": "Düşük stok uyarısı ve envanter bildirimi (kritik yol).",
+        "capabilities": [
+          "inventory_alert",
+          "stock_notification"
+        ],
+        "supported_business_intents": [
+          "low_stock",
+          "inventory",
+          "alert",
+          "replenishment",
+          "inventory_risk"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 0.95
+      }
+    ]
+  }
+
+--------------------------------------------------------------------------------
+TEST #28: İş içgörüleri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.770666
+DETAY  : BI snapshot alındı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/business-insights?user_id=1
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "insights": [
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Banner etkileşim artışı (CTR 14.20%)",
+        "confidence": 0.784,
+        "outcome": "planned",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T04:06:51.640268"
+      },
+      {
+        "workflow": "general_marketing_campaign",
+        "reason": "Yeterli iş sinyali bulunamadı",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "general_marketing",
+        "created_at": "2026-05-22T04:06:51.632306"
+      },
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Onay geri bildirimi: approved",
+        "confidence": null,
+        "outcome": "approved",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T04:06:14.077309"
+      },
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Banner etkileşim artışı (CTR 13.50%)",
+        "confidence": 0.77,
+        "outcome": "planned",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T04:06:12.120420"
+      },
+      {
+        "workflow": "general_marketing_campaign",
+        "reason": "Yeterli iş sinyali bulunamadı",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "general_marketing",
+        "created_at": "2026-05-22T04:06:12.112505"
+      },
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Onay geri bildirimi: approved",
+        "confidence": null,
+        "outcome": "approved",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T04:04:41.861832"
+      },
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Banner etkileşim artışı (CTR 8.20%)",
+        "confidence": 0.664,
+        "outcome": "planned",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T04:04:19.314829"
+      },
+      {
+        "workflow": "general_marketing_campaign",
+        "reason": "Yeterli iş sinyali bulunamadı",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "general_marketing",
+        "created_at": "2026-05-22T04:04:19.307194"
+      },
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Onay geri bildirimi: approved",
+        "confidence": null,
+        "outcome": "approved",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T03:49:54.099859"
+      },
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Banner etkileşim artışı (CTR 10.70%)",
+        "confidence": 0.714,
+        "outcome": "planned",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T03:49:49.106011"
+      },
+      {
+        "workflow": "general_marketing_campaign",
+        "reason": "Yeterli iş sinyali bulunamadı",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "general_marketing",
+        "created_at": "2026-05-22T03:49:49.100318"
+      },
+      {
+        "workflow": "inventory_risk_bitki_ay_seti",
+        "reason": "1 ürün düşük stokta",
+        "confidence": 0.8,
+        "outcome": "planned",
+        "business_intent": "inventory_risk",
+        "created_at": "2026-05-22T03:49:49.091219"
+      },
+      {
+        "workflow": "discount_promotion_campaign",
+        "reason": "Kampanya aktivitesi",
+        "confidence": 0.82,
+        "outcome": "planned",
+        "business_intent": "discount_promotion",
+        "created_at": "2026-05-22T03:49:49.082232"
+      },
+      {
+        "workflow": "general_marketing_campaign",
+        "reason": "Yeterli iş sinyali bulunamadı",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "general_marketing",
+        "created_at": "2026-05-22T03:49:49.077476"
+      },
+      {
+        "workflow": "reputation_campaign",
+        "reason": "Düşük puanlı müşteri geri bildirimi",
+        "confidence": 0.852,
+        "outcome": "planned",
+        "business_intent": "reputation",
+        "created_at": "2026-05-22T03:49:49.072318"
+      },
+      {
+        "workflow": "growth_marketing_campaign",
+        "reason": "Müşteri yorumu olayı: review.created",
+        "confidence": 0.8,
+        "outcome": "planned",
+        "business_intent": "growth_marketing",
+        "created_at": "2026-05-22T03:49:49.067598"
+      },
+      {
+        "workflow": "discount_promotion_bitki_ay_seti",
+        "reason": "Fiyat düşüşü %41 — promosyon önerilir",
+        "confidence": 0.828,
+        "outcome": "planned",
+        "business_intent": "discount_promotion",
+        "created_at": "2026-05-22T03:49:49.061913"
+      },
+      {
+        "workflow": "inventory_risk_bitki_ay_seti",
+        "reason": "1 ürün düşük stokta",
+        "confidence": 0.8,
+        "outcome": "planned",
+        "business_intent": "inventory_risk",
+        "created_at": "2026-05-22T03:49:49.042478"
+      },
+      {
+        "workflow": "inventory_risk_teknoloji_k_esi_ma_aza",
+        "reason": "1 ürün düşük stokta",
+        "confidence": 0.8,
+        "outcome": "planned",
+        "business_intent": "inventory_risk",
+        "created_at": "2026-05-22T03:49:49.035254"
+      },
+      {
+        "workflow": "general_marketing_campaign",
+        "reason": "Yeterli iş sinyali bulunamadı",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "general_marketing",
+        "created_at": "2026-05-22T03:49:49.026963"
+      }
+    ],
+    "state": {
+      "generated_at": "2026-05-22T04:07:12.769998",
+      "user_id": 1,
+      "store_id": null,
+      "sales": {
+        "total_item_sales": 6,
+        "top_products": [
+          {
+            "id": 4,
+            "name": "Deri Cüzdan",
+            "sales": 2
+          },
+          {
+            "id": 5,
+            "name": "Deri Cüzdan",
+            "sales": 2
+          },
+          {
+            "id": 1,
+            "name": "Bitki Çayı Seti",
+            "sales": 1
+          },
+          {
+            "id": 3,
+            "name": "Zeytinyağı 500ml",
+            "sales": 1
+          },
+          {
+            "id": 2,
+            "name": "Bitki Çayı Seti",
+            "sales": 0
+          }
+        ]
+      },
+      "inventory": {
+        "total_stock_units": 25,
+        "low_stock_count": 5,
+        "low_stock_items": [
+          {
+            "id": 1,
+            "name": "Bitki Çayı Seti",
+            "stock": 5
+          },
+          {
+            "id": 2,
+            "name": "Bitki Çayı Seti",
+            "stock": 2
+          },
+          {
+            "id": 3,
+            "name": "Zeytinyağı 500ml",
+            "stock": 7
+          },
+          {
+            "id": 4,
+            "name": "Deri Cüzdan",
+            "stock": 5
+          },
+          {
+            "id": 5,
+            "name": "Deri Cüzdan",
+            "stock": 6
+          }
+        ],
+        "health": "critical"
+      },
+      "campaigns": {
+        "active_count": 1,
+        "recent": [
+          {
+            "name": "welcome_instagram_post",
+            "status": "completed",
+            "created_at": "2026-05-22T04:06:49.475683"
+          },
+          {
+            "name": "growth_marketing_campaign",
+            "status": "completed",
+            "created_at": "2026-05-22T04:06:14.078494"
+          },
+          {
+            "name": "welcome_instagram_post",
+            "status": "completed",
+            "created_at": "2026-05-22T04:06:11.377591"
+          },
+          {
+            "name": "growth_marketing_campaign",
+            "status": "completed",
+            "created_at": "2026-05-22T04:04:41.862710"
+          },
+          {
+            "name": "welcome_instagram_post",
+            "status": "completed",
+            "created_at": "2026-05-22T04:04:15.310043"
+          },
+          {
+            "name": "growth_marketing_campaign",
+            "status": "completed",
+            "created_at": "2026-05-22T03:49:54.100862"
+          },
+          {
+            "name": "welcome_instagram_post",
+            "status": "completed",
+            "created_at": "2026-05-22T03:49:49.011586"
+          },
+          {
+            "name": "general_marketing_teknoloji_k_esi_ma_aza",
+            "status": "completed",
+            "created_at": "2026-05-22T03:49:31.665745"
+          },
+          {
+            "name": "welcome_instagram_post",
+            "status": "completed",
+            "created_at": "2026-05-22T03:49:20.916398"
+          },
+          {
+            "name": "welcome_instagram_post",
+   
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #29: İş durumu grafiği
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.771644
+DETAY  : stok sağlığı=critical
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/business-state?user_id=1
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "generated_at": "2026-05-22T04:07:12.771144",
+    "user_id": 1,
+    "store_id": null,
+    "sales": {
+      "total_item_sales": 6,
+      "top_products": [
+        {
+          "id": 4,
+          "name": "Deri Cüzdan",
+          "sales": 2
+        },
+        {
+          "id": 5,
+          "name": "Deri Cüzdan",
+          "sales": 2
+        },
+        {
+          "id": 1,
+          "name": "Bitki Çayı Seti",
+          "sales": 1
+        },
+        {
+          "id": 3,
+          "name": "Zeytinyağı 500ml",
+          "sales": 1
+        },
+        {
+          "id": 2,
+          "name": "Bitki Çayı Seti",
+          "sales": 0
+        }
+      ]
+    },
+    "inventory": {
+      "total_stock_units": 25,
+      "low_stock_count": 5,
+      "low_stock_items": [
+        {
+          "id": 1,
+          "name": "Bitki Çayı Seti",
+          "stock": 5
+        },
+        {
+          "id": 2,
+          "name": "Bitki Çayı Seti",
+          "stock": 2
+        },
+        {
+          "id": 3,
+          "name": "Zeytinyağı 500ml",
+          "stock": 7
+        },
+        {
+          "id": 4,
+          "name": "Deri Cüzdan",
+          "stock": 5
+        },
+        {
+          "id": 5,
+          "name": "Deri Cüzdan",
+          "stock": 6
+        }
+      ],
+      "health": "critical"
+    },
+    "campaigns": {
+      "active_count": 1,
+      "recent": [
+        {
+          "name": "welcome_instagram_post",
+          "status": "completed",
+          "created_at": "2026-05-22T04:06:49.475683"
+        },
+        {
+          "name": "growth_marketing_campaign",
+          "status": "completed",
+          "created_at": "2026-05-22T04:06:14.078494"
+        },
+        {
+          "name": "welcome_instagram_post",
+          "status": "completed",
+          "created_at": "2026-05-22T04:06:11.377591"
+        },
+        {
+          "name": "growth_marketing_campaign",
+          "status": "completed",
+          "created_at": "2026-05-22T04:04:41.862710"
+        },
+        {
+          "name": "welcome_instagram_post",
+          "status": "completed",
+          "created_at": "2026-05-22T04:04:15.310043"
+        },
+        {
+          "name": "growth_marketing_campaign",
+          "status": "completed",
+          "created_at": "2026-05-22T03:49:54.100862"
+        },
+        {
+          "name": "welcome_instagram_post",
+          "status": "completed",
+          "created_at": "2026-05-22T03:49:49.011586"
+        },
+        {
+          "name": "general_marketing_teknoloji_k_esi_ma_aza",
+          "status": "completed",
+          "created_at": "2026-05-22T03:49:31.665745"
+        },
+        {
+          "name": "welcome_instagram_post",
+          "status": "completed",
+          "created_at": "2026-05-22T03:49:20.916398"
+        },
+        {
+          "name": "welcome_instagram_post",
+          "status": "completed",
+          "created_at": "2026-05-22T02:28:38.654651"
+        }
+      ]
+    },
+    "workflows": {
+      "completed": 14,
+      "scheduled": 1
+    },
+    "tasks": {
+      "completed": 5,
+      "dead_letter": 8,
+      "running": 1
+    },
+    "engagement": {
+      "pending_approvals": 15,
+      "negative_reviews": 0
+    },
+    "tool_performance": {
+      "instagram_campaign_tool": {
+        "success": 5,
+        "failed": 0,
+        "total": 5
+      }
+    },
+    "sentiment": "positive"
+  }
+
+--------------------------------------------------------------------------------
+TEST #30: Planlayıcı belleği
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.772819
+DETAY  : 20 bellek kaydı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/planner-memory?user_id=1
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 23,
+        "workflow": "growth_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.784,
+        "summary": "growth_marketing | growth_marketing_campaign | Banner etkileşim artışı (CTR 14.20%) | banner.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T04:06:51.640268"
+      },
+      {
+        "id": 22,
+        "workflow": "general_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "general_marketing | general_marketing_campaign | Yeterli iş sinyali bulunamadı | banner.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T04:06:51.632306"
+      },
+      {
+        "id": 21,
+        "workflow": "growth_marketing_campaign",
+        "decision": "feedback",
+        "outcome": "approved",
+        "confidence": null,
+        "summary": "approval_17_approved",
+        "feedback": null,
+        "approval_status": "approved",
+        "created_at": "2026-05-22T04:06:14.077309"
+      },
+      {
+        "id": 20,
+        "workflow": "growth_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.77,
+        "summary": "growth_marketing | growth_marketing_campaign | Banner etkileşim artışı (CTR 13.50%) | banner.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T04:06:12.120420"
+      },
+      {
+        "id": 19,
+        "workflow": "general_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "general_marketing | general_marketing_campaign | Yeterli iş sinyali bulunamadı | banner.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T04:06:12.112505"
+      },
+      {
+        "id": 18,
+        "workflow": "growth_marketing_campaign",
+        "decision": "feedback",
+        "outcome": "approved",
+        "confidence": null,
+        "summary": "approval_15_approved",
+        "feedback": null,
+        "approval_status": "approved",
+        "created_at": "2026-05-22T04:04:41.861832"
+      },
+      {
+        "id": 17,
+        "workflow": "growth_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.664,
+        "summary": "growth_marketing | growth_marketing_campaign | Banner etkileşim artışı (CTR 8.20%) | banner.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T04:04:19.314829"
+      },
+      {
+        "id": 16,
+        "workflow": "general_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "general_marketing | general_marketing_campaign | Yeterli iş sinyali bulunamadı | banner.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T04:04:19.307194"
+      },
+      {
+        "id": 15,
+        "workflow": "growth_marketing_campaign",
+        "decision": "feedback",
+        "outcome": "approved",
+        "confidence": null,
+        "summary": "approval_13_approved",
+        "feedback": null,
+        "approval_status": "approved",
+        "created_at": "2026-05-22T03:49:54.099859"
+      },
+      {
+        "id": 14,
+        "workflow": "growth_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.714,
+        "summary": "growth_marketing | growth_marketing_campaign | Banner etkileşim artışı (CTR 10.70%) | banner.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.106011"
+      },
+      {
+        "id": 13,
+        "workflow": "general_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "general_marketing | general_marketing_campaign | Yeterli iş sinyali bulunamadı | banner.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.100318"
+      },
+      {
+        "id": 12,
+        "workflow": "inventory_risk_bitki_ay_seti",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.8,
+        "summary": "inventory_risk | inventory_risk_bitki_ay_seti | 1 ürün düşük stokta | sales.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.091219"
+      },
+      {
+        "id": 11,
+        "workflow": "discount_promotion_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.82,
+        "summary": "discount_promotion | discount_promotion_campaign | Kampanya aktivitesi | campaign.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.082232"
+      },
+      {
+        "id": 10,
+        "workflow": "general_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "general_marketing | general_marketing_campaign | Yeterli iş sinyali bulunamadı | customer.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.077476"
+      },
+      {
+        "id": 9,
+        "workflow": "reputation_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.852,
+        "summary": "reputation | reputation_campaign | Düşük puanlı müşteri geri bildirimi | review.negative",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.072318"
+      },
+      {
+        "id": 8,
+        "workflow": "growth_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.8,
+        "summary": "growth_marketing | growth_marketing_campaign | Müşteri yorumu olayı: review.created | review.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.067598"
+      },
+      {
+        "id": 7,
+        "workflow": "discount_promotion_bitki_ay_seti",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.828,
+        "summary": "discount_promotion | discount_promotion_bitki_ay_seti | Fiyat düşüşü %41 — promosyon önerilir | product.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.061913"
+      },
+      {
+        "id": 6,
+        "workflow": "inventory_risk_bitki_ay_seti",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.8,
+        "summary": "inventory_risk | inventory_risk_bitki_ay_seti | 1 ürün düşük stokta | product.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.042478"
+      },
+      {
+        "id": 5,
+        "workflow": "inventory_risk_teknoloji_k_esi_ma_aza",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.8,
+        "summary": "inventory_risk | inventory_risk_teknoloji_k_esi_ma_aza | 1 ürün düşük stokta | store.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.035254"
+      },
+      {
+        "id": 4,
+        "workflow": "general_marketing_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "general_marketing | general_marketing_campaign | Yeterli iş sinyali bulunamadı | banner.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-22T03:49:49.026963"
+      }
+    ]
+  }
+
+--------------------------------------------------------------------------------
+TEST #31: Agent kayıtları
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.773590
+DETAY  : 5 agent tanımı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/agents
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": "marketing",
+        "name": "Marketing Agent",
+        "domain": "marketing",
+        "description": "Kampanya, sosyal medya, banner ve promosyon planlama",
+        "routes": [
+          "creative",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "marketing"
+        ]
+      },
+      {
+        "id": "analytics",
+        "name": "Analytics Agent",
+        "domain": "analytics",
+        "description": "Trend analizi, satış içgörüleri, performans",
+        "routes": [
+          "analytical",
+          "monitoring",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "analytics",
+          "marketing"
+        ]
+      },
+      {
+        "id": "support",
+        "name": "Support Agent",
+        "domain": "support",
+        "description": "Müşteri soruları, yorumlar, destek kampanyaları",
+        "routes": [
+          "creative",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "support",
+          "marketing"
+        ]
+      },
+      {
+        "id": "inventory",
+        "name": "Inventory Agent",
+        "domain": "inventory",
+        "description": "Stok, sipariş, tedarik — yalnızca kritik deterministik yol",
+        "routes": [
+          "critical"
+        ],
+        "tool_categories": [
+          "inventory"
+        ]
+      },
+      {
+        "id": "executive",
+        "name": "Executive Agent",
+        "domain": "executive",
+        "description": "Üst düzey iş kararları ve onay önerileri",
+        "routes": [
+          "analytical",
+          "monitoring",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "marketing",
+          "analytics"
+        ]
+      }
+    ]
+  }
+
+--------------------------------------------------------------------------------
+TEST #32: Onay kuyruğu listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.776154
+DETAY  : 15 bekleyen onay
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/approvals?user_id=1
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 19,
+        "user_id": 1,
+        "proposal_id": 19,
+        "event_id": 76,
+        "workflow_name": "growth_marketing_campaign",
+        "status": "pending",
+        "risk_level": "medium",
+        "confidence": 0.784,
+        "reason": "Plan düşük güven ile işaretlendi",
+        "feedback": null,
+        "edited_proposal_json": null,
+        "approved_by": null,
+        "created_at": "2026-05-22T04:06:51.641979",
+        "updated_at": "2026-05-22T04:06:51.641979",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "growth_marketing_campaign",
+          "workflow": "growth_marketing_campaign",
+          "reason": "Banner etkileşim artışı (CTR 14.20%)",
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.784,
+          "requires_approval": true,
+          "source": "autonomous_contextual",
+          "business_intent": "growth_marketing",
+          "delay": 0,
+          "task_type": "autonomous_growth_marketing_campaign",
+          "entity_type": "store",
+          "entity_id": 5,
+          "task_payload": {
+            "goal": "Banner etkileşim artışı (CTR 14.20%)",
+            "business_intent": "growth_marketing",
+            "event": {
+              "id": 76,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=14.20%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.142,
+                "click_rate": 0.142,
+                "impressions": 6174,
+                "clicks": 74
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.142
+                }
+              }
+            },
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "platform": "instagram",
+            "bi_summary": "Banner etkileşim artışı (CTR 14.20%)",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "reasoning": "Bağlam ve 'growth_marketing' niyetine göre 2 araç seçildi",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "bi_insights": [
+            "engagement_spike"
+          ],
+          "approval_reason": "Araç onay gerektiriyor: instagram_campaign_tool",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 18,
+        "user_id": 1,
+        "proposal_id": 18,
+        "event_id": 75,
+        "workflow_name": "general_marketing_campaign",
+        "status": "pending",
+        "risk_level": "medium",
+        "confidence": 0.66,
+        "reason": "Plan düşük güven ile işaretlendi",
+        "feedback": null,
+        "edited_proposal_json": null,
+        "approved_by": null,
+        "created_at": "2026-05-22T04:06:51.637164",
+        "updated_at": "2026-05-22T04:06:51.637164",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "general_marketing_campaign",
+          "workflow": "general_marketing_campaign",
+          "reason": "Yeterli iş sinyali bulunamadı",
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "source": "autonomous_contextual",
+          "business_intent": "general_marketing",
+          "delay": 0,
+          "task_type": "autonomous_general_marketing_campaign",
+          "entity_type": "store",
+          "entity_id": 5,
+          "task_payload": {
+            "goal": "Yeterli iş sinyali bulunamadı",
+            "business_intent": "general_marketing",
+            "event": {
+              "id": 75,
+              "name": "banner.created",
+              "description": "Banner created: Banner Promo-3347",
+              "group": "banner",
+              "payload": {
+                "store_id": 11,
+                "title": "Banner Promo-3347",
+                "image_url": "https://example.com/banner.jpg"
+              },
+              "changes": {}
+            },
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "platform": "instagram",
+            "bi_summary": "Belirgin iş sinyali yok",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "reasoning": "Bağlam ve 'general_marketing' niyetine göre 2 araç seçildi",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "bi_insights": [],
+          "approval_reason": "Plan düşük güven ile işaretlendi",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 16,
+        "user_id": 1,
+        "proposal_id": 16,
+        "event_id": 61,
+        "workflow_name": "general_marketing_campaign",
+        "status": "pending",
+        "risk_level": "medium",
+        "confidence": 0.66,
+        "reason": "Plan düşük güven ile işaretlendi",
+        "feedback": null,
+        "edited_proposal_json": null,
+        "approved_by": null,
+        "created_at": "2026-05-22T04:06:12.117288",
+        "updated_at": "2026-05-22T04:06:12.117288",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "general_marketing_campaign",
+          "workflow": "general_marketing_campaign",
+          "reason": "Yeterli iş sinyali bulunamadı",
+          "tools": [
+            "banner_generator_tool",
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "source": "autonomous_contextual",
+          "business_intent": "general_marketing",
+          "delay": 0,
+          "task_type": "autonomous_general_marketing_campaign",
+          "entity_type": "store",
+          "entity_id": 4,
+          "task_payload": {
+            "goal": "Yeterli iş sinyali bulunamadı",
+            "business_intent": "general_marketing",
+            "event": {
+              "id": 61,
+              "name": "banner.created",
+              "description": "Banner created: Banner Promo-2993",
+              "group": "banner",
+              "payload": {
+                "store_id": 10,
+                "title": "Banner Promo-2993",
+                "image_url": "https://example.com/banner.jpg"
+              },
+              "changes": {}
+            },
+            "tools": [
+              "banner_generator_tool",
+              "instagram_campaign_tool"
+            ],
+            "platform": "instagram",
+            "bi_summary": "Belirgin iş sinyali yok",
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "reasoning": "Bağlam ve 'general_marketing' niyetine göre 2 araç seçildi",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "bi_insights": [],
+          "approval_reason": "Plan düşük güven ile işaretlendi",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 14,
+        "user_id": 1,
+        "proposal_id": 14,
+        "event_id": 47,
+        "workflow_name": "general_marketing_campaign",
+        "status": "pending",
+        "risk_level": "medium",
+        "confidence": 0.66,
+        "reason": "Plan düşük güven ile işaretlendi",
+        "feedback": null,
+        "edited_proposal_json": null,
+        "approved_by": null,
+        "created_at": "2026-05-22T04:04:19.311863",
+        "updated_at": "2026-05-22T04:04:19.311863",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name"
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #33: Onay işlemi (ilk bekleyen)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.785561
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/internal/approvals/19/approve
+  HTTP 200 (7 ms)
+
+YANIT:
+  {
+    "applied": true,
+    "decision": "create_workflow",
+    "workflow_id": 16,
+    "workflow_name": "growth_marketing_campaign",
+    "proposal": {
+      "decision": "create_workflow",
+      "workflow_name": "growth_marketing_campaign",
+      "workflow": "growth_marketing_campaign",
+      "reason": "Banner etkileşim artışı (CTR 14.20%)",
+      "tools": [
+        "banner_generator_tool",
+        "instagram_campaign_tool"
+      ],
+      "priority": "medium",
+      "confidence": 0.784,
+      "requires_approval": false,
+      "source": "autonomous_contextual",
+      "business_intent": "growth_marketing",
+      "delay": 0,
+      "task_type": "autonomous_growth_marketing_campaign",
+      "entity_type": "store",
+      "entity_id": 5,
+      "task_payload": {
+        "goal": "Banner etkileşim artışı (CTR 14.20%)",
+        "business_intent": "growth_marketing",
+        "event": {
+          "id": 76,
+          "name": "banner.updated",
+          "description": "Banner performans güncellendi CTR=14.20%",
+          "group": "banner",
+          "payload": {
+            "ctr": 0.142,
+            "click_rate": 0.142,
+            "impressions": 6174,
+            "clicks": 74
+          },
+          "changes": {
+            "ctr": {
+              "from": 0,
+              "to": 0.142
+            }
+          }
+        },
+        "tools": [
+          "banner_generator_tool",
+          "instagram_campaign_tool"
+        ],
+        "platform": "instagram",
+        "bi_summary": "Banner etkileşim artışı (CTR 14.20%)",
+        "agent": {
+          "agent_id": "marketing",
+          "agent_name": "Marketing Agent",
+          "agent_domain": "marketing",
+          "multi_agent_ready": true
+        }
+      },
+      "reasoning": "Bağlam ve 'growth_marketing' niyetine göre 2 araç seçildi",
+      "agent": {
+        "agent_id": "marketing",
+        "agent_name": "Marketing Agent",
+        "agent_domain": "marketing",
+        "multi_agent_ready": true
+      },
+      "bi_insights": [
+        "engagement_spike"
+      ],
+      "approval_reason": "Araç onay gerektiriyor: instagram_campaign_tool",
+      "risk_level": "medium",
+      "approved": true
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #34: Kural listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.786458
+DETAY  : 1 kural
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/rules?user_id=1
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "rule_name": "welcome_instagram_post_store_created",
+        "natural_language": "imported from rules.txt",
+        "dsl": "RULE welcome_instagram_post_store_created\nWHEN\nstore.created\nTHEN\nworkflow welcome_instagram_post",
+        "enabled": 1,
+        "created_at": "2026-05-22T00:28:03.277949",
+        "updated_at": "2026-05-22T00:28:03.277949"
+      }
+    ],
+    "user_id": 1,
+    "cache": {
+      "cached_users": [
+        1
+      ],
+      "entries": {
+        "1": {
+          "rule_count": 1,
+          "loaded_at": 54645.680266064,
+          "version": 0
+        }
+      }
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #35: Önbellek istatistikleri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-22T04:07:12.787142
+DETAY  : HTTP 200
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/cache-stats
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "cached_users": [
+      1
+    ],
+    "entries": {
+      "1": {
+        "rule_count": 1,
+        "loaded_at": 54645.680266064,
+        "version": 0
+      }
+    }
+  }
+
+================================================================================
+ÖZET
+================================================================================
+Toplam test  : 35
+Başarılı     : 35
+Başarısız    : 0
+
+Orkestrasyon pipeline: VERİ ÜRETTİ ✓
+
+================================================================================

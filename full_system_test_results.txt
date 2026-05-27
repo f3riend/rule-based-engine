@@ -1,0 +1,2528 @@
+================================================================================
+AI İŞLETİM SİSTEMİ — TAM ENTEGRASYON TEST SONUÇLARI
+================================================================================
+
+Başlangıç       : 2026-05-23 22:18:10
+Bitiş           : 2026-05-23 22:19:12
+Base URL        : http://127.0.0.1:8000
+Kullanıcı ID    : 1
+Yerel orkestr.  : True
+Döngü sayısı    : 10
+
+--- ORKESTRASYON ÖZETİ ---
+Mağaza ID         : 1
+Ürün ID           : 1
+Sipariş ID        : 1
+Banner ID         : 1
+Kampanya ID       : 1
+Yerel döngü çalıştı: evet
+Timeline          : 0 → 31
+İş akışları       : 0 → 7
+AI görevleri      : 0 → 7
+Planlayıcı öneri  : 0 → 0
+
+================================================================================
+TEST DETAYLARI
+================================================================================
+
+--------------------------------------------------------------------------------
+TEST #1: Sağlık kontrolü
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.881819
+DETAY  : API ayakta
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/ai/v1/health
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": {
+      "ok": true,
+      "server_time": "2026-05-23T19:18:10.881369",
+      "agent": {
+        "id": 1,
+        "name": "Fake AI Agent",
+        "status": "active"
+      },
+      "token": {
+        "scope": "admin",
+        "rate_limit_per_min": 999
+      }
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #2: Mağaza oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.888938
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-store
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "name": "Teknoloji Köşesi Mağaza-4819",
+      "owner": "Test Sahibi",
+      "instagram": "@testshop"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 1
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #3: Ürün oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.895768
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-product
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "store_id": 1,
+      "name": "Seramik Vazo",
+      "price": 389.81,
+      "stock": 58,
+      "category": "genel"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 1
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #4: Sipariş oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.912279
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-order
+  HTTP 200 (16 ms)
+  Gövde:
+    {
+      "store_id": 1,
+      "item_id": 1,
+      "quantity": 3
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 1,
+      "order_event_id": 3,
+      "stock_event_id": 4
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #5: Stok güncelleme (düşük stok)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.919733
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-stock
+  HTTP 200 (7 ms)
+  Gövde:
+    {
+      "item_id": 1,
+      "stock": 5
+    }
+
+YANIT:
+  {
+    "success": true
+  }
+
+--------------------------------------------------------------------------------
+TEST #6: İndirim uygulama
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.927127
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-discount
+  HTTP 200 (7 ms)
+  Gövde:
+    {
+      "item_id": 1,
+      "discount": 16,
+      "store_id": 1
+    }
+
+YANIT:
+  {
+    "success": true,
+    "discount": 16.0,
+    "new_price": 327.44
+  }
+
+--------------------------------------------------------------------------------
+TEST #7: Olumlu yorum oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.933949
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-review
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "store_id": 1,
+      "item_id": 1,
+      "author": "Ayşe K.",
+      "rating": 5.0,
+      "comment": "Paketleme özenliydi."
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 1
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #8: Olumsuz yorum oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.940516
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-review
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "store_id": 1,
+      "item_id": 1,
+      "author": "Mehmet Y.",
+      "rating": 1.0,
+      "comment": "İade süreci çok yavaş.",
+      "sentiment": "negative"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 2
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #9: Müşteri sorusu oluşturma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.947995
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-question
+  HTTP 200 (7 ms)
+  Gövde:
+    {
+      "store_id": 1,
+      "item_id": 1,
+      "author": "Zeynep",
+      "question": "Beden tablosu var mı?"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 1
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #10: Kampanya başlatma
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.954240
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/create-campaign
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "store_id": 1,
+      "name": "Kampanya Yaz-5880",
+      "campaign_type": "promotion",
+      "discount_pct": 16
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 1
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #11: Satış metrik güncelleme
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.960144
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-sales
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "item_id": 1,
+      "sales_change_pct": -26.108533263669408
+    }
+
+YANIT:
+  {
+    "success": true,
+    "sales": 2
+  }
+
+--------------------------------------------------------------------------------
+TEST #12: Kargo gecikmesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.966435
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/shipping-delay
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "order_id": 1,
+      "delay_days": 6,
+      "reason": "Depo yoğunluğu — entegrasyon testi"
+    }
+
+YANIT:
+  {
+    "success": true,
+    "order_id": 1
+  }
+
+--------------------------------------------------------------------------------
+TEST #13: Banner oluşturma (AI API)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.972271
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/ai/v1/banners
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "store_id": 1,
+      "title": "Banner Promo-4163",
+      "image_url": "https://example.com/banner.jpg"
+    }
+
+YANIT:
+  {
+    "data": {
+      "id": 1
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #14: Banner performans güncelleme
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:18:10.978144
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/internal/update-banner-performance
+  HTTP 200 (5 ms)
+  Gövde:
+    {
+      "banner_id": 1,
+      "ctr": 0.131,
+      "impressions": 7590,
+      "clicks": 398
+    }
+
+YANIT:
+  {
+    "success": true
+  }
+
+--------------------------------------------------------------------------------
+TEST #15: Yerel orkestrasyon döngüsü
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:09.517515
+DETAY  : 22 olay işlendi, 10 döngü tamamlandı
+
+--------------------------------------------------------------------------------
+TEST #16: Zaman tüneli listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.730812
+DETAY  : 31 olay, gruplar: banner, campaign, customer, order, product, review, sales, shipping, stock, store
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/timeline?limit=50
+  HTTP 200 (2 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 31,
+        "ts": "2026-05-23T19:19:11.375313",
+        "event": "executed",
+        "event_label": "Executed",
+        "group": "stock",
+        "group_label": "Stock",
+        "description": "Düşük stok uyarısı gönderildi",
+        "store_id": null,
+        "subject": {
+          "type": null,
+          "id": null
+        },
+        "causer": {
+          "type": "tool",
+          "id": 0,
+          "name": "low_stock_notification_tool"
+        },
+        "changes": {},
+        "payload": {
+          "success": true,
+          "tool": "low_stock_notification_tool",
+          "message": "Düşük stok uyarısı gönderildi",
+          "input_text": "Alert: The 'Seramik Vazo' is at low stock level (5 units remaining) with a moderate inventory risk score of 0.75. Please consider restocking or management actions."
+        },
+        "meta": {
+          "processed_by_rule_engine": true,
+          "orchestration": {
+            "route": "skipped",
+            "path": "skipped_no_subject",
+            "rules_matched": 0,
+            "planner_used": false,
+            "autonomous_used": false,
+            "skip_reason": "missing_subject_type",
+            "processed_at": "2026-05-23T19:19:12.295897",
+            "listener_ms": 0
+          },
+          "tool_name": "low_stock_notification_tool"
+        }
+      },
+      {
+        "id": 30,
+        "ts": "2026-05-23T19:19:11.369701",
+        "event": "executed",
+        "event_label": "Executed",
+        "group": "customer",
+        "group_label": "Customer",
+        "description": "Destek cevabı hazırlandı",
+        "store_id": null,
+        "subject": {
+          "type": null,
+          "id": null
+        },
+        "causer": {
+          "type": "tool",
+          "id": 0,
+          "name": "support_response_tool"
+        },
+        "changes": {},
+        "payload": {
+          "success": true,
+          "tool": "support_response_tool",
+          "message": "Destek cevabı hazırlandı",
+          "input_text": "We have noticed a significant sales drop for the 'Seramik Vazo' and currently low stock levels. We are enhancing customer support to address any issues and improve customer engagement immediately."
+        },
+        "meta": {
+          "processed_by_rule_engine": true,
+          "orchestration": {
+            "route": "skipped",
+            "path": "skipped_no_subject",
+            "rules_matched": 0,
+            "planner_used": false,
+            "autonomous_used": false,
+            "skip_reason": "missing_subject_type",
+            "processed_at": "2026-05-23T19:19:12.289646",
+            "listener_ms": 0
+          },
+          "tool_name": "support_response_tool"
+        }
+      },
+      {
+        "id": 29,
+        "ts": "2026-05-23T19:19:02.560126",
+        "event": "executed",
+        "event_label": "Executed",
+        "group": "customer",
+        "group_label": "Customer",
+        "description": "SSS güncellendi",
+        "store_id": null,
+        "subject": {
+          "type": null,
+          "id": null
+        },
+        "causer": {
+          "type": "tool",
+          "id": 0,
+          "name": "faq_update_tool"
+        },
+        "changes": {},
+        "payload": {
+          "success": true,
+          "tool": "faq_update_tool",
+          "message": "SSS güncellendi",
+          "input_text": "FAQ updated for 'Seramik Vazo': Addressing common questions about stock availability, expected restock dates, and suggestions for alternative products to help customers during low stock periods."
+        },
+        "meta": {
+          "processed_by_rule_engine": true,
+          "orchestration": {
+            "route": "skipped",
+            "path": "skipped_no_subject",
+            "rules_matched": 0,
+            "planner_used": false,
+            "autonomous_used": false,
+            "skip_reason": "missing_subject_type",
+            "processed_at": "2026-05-23T19:19:03.512960",
+            "listener_ms": 0
+          },
+          "tool_name": "faq_update_tool"
+        }
+      },
+      {
+        "id": 28,
+        "ts": "2026-05-23T19:19:02.550204",
+        "event": "executed",
+        "event_label": "Executed",
+        "group": "stock",
+        "group_label": "Stock",
+        "description": "Düşük stok uyarısı gönderildi",
+        "store_id": null,
+        "subject": {
+          "type": null,
+          "id": null
+        },
+        "causer": {
+          "type": "tool",
+          "id": 0,
+          "name": "low_stock_notification_tool"
+        },
+        "changes": {},
+        "payload": {
+          "success": true,
+          "tool": "low_stock_notification_tool",
+          "message": "Düşük stok uyarısı gönderildi",
+          "input_text": "Low stock alert: Only 5 units of 'Seramik Vazo' remain in inventory. Consider inventory replenishment planning to avoid stockout."
+        },
+        "meta": {
+          "processed_by_rule_engine": true,
+          "orchestration": {
+            "route": "skipped",
+            "path": "skipped_no_subject",
+            "rules_matched": 0,
+            "planner_used": false,
+            "autonomous_used": false,
+            "skip_reason": "missing_subject_type",
+            "processed_at": "2026-05-23T19:19:03.509824",
+            "listener_ms": 0
+          },
+          "tool_name": "low_stock_notification_tool"
+        }
+      },
+      {
+        "id": 27,
+        "ts": "2026-05-23T19:19:02.545164",
+        "event": "executed",
+        "event_label": "Executed",
+        "group": "customer",
+        "group_label": "Customer",
+        "description": "Destek cevabı hazırlandı",
+        "store_id": null,
+        "subject": {
+          "type": null,
+          "id": null
+        },
+        "causer": {
+          "type": "tool",
+          "id": 0,
+          "name": "support_response_tool"
+        },
+        "changes": {},
+        "payload": {
+          "success": true,
+          "tool": "support_response_tool",
+          "message": "Destek cevabı hazırlandı",
+          "input_text": "We noticed a significant drop in sales for 'Seramik Vazo' and are here to assist you with any questions or concerns. Please reach out to our support team for prompt help regarding availability, product details, or alternatives."
+        },
+        "meta": {
+          "processed_by_rule_engine": true,
+          "orchestration": {
+            "route": "skipped",
+            "path": "skipped_no_subject",
+            "rules_matched": 0,
+            "planner_used": false,
+            "autonomous_used": false,
+            "skip_reason": "missing_subject_type",
+            "processed_at": "2026-05-23T19:19:03.503708",
+            "listener_ms": 0
+          },
+          "tool_name": "support_response_tool"
+        }
+      },
+      {
+        "id": 26,
+        "ts": "2026-05-23T19:18:57.342994",
+        "event": "executed",
+        "event_label": "Executed",
+        "group": "customer",
+        "group_label": "Customer",
+        "description": "Destek cevabı hazırlandı",
+        "store_id": null,
+        "subject": {
+          "type": null,
+          "id": null
+        },
+        "causer": {
+          "type": "tool",
+          "id": 0,
+          "name": "support_response_tool"
+        },
+        "changes": {},
+        "payload": {
+          "success": true,
+          "tool": "support_response_tool",
+          "message": "Destek cevabı hazırlandı",
+          "input_text": "Dear Customer, thank you for reaching out. The size chart for our top-selling item, Seramik Vazo, is available and we will provide you with the details promptly. Please note the item is currently in low stock. Feel free to ask if you need more assistance."
+        },
+        "meta": {
+          "processed_by_rule_engine": true,
+          "orchestration": {
+            "route": "skipped",
+            "path": "skipped_no_subject",
+            "rules_matched": 0,
+            "planner_used": false,
+            "autonomous_used": false,
+            "skip_reason": "missing_subject_type",
+            "processed_at": "2026-05-23T19:18:57.497656",
+            "listener_ms": 0
+          },
+          "tool_name": "support_response_tool"
+        }
+      },
+      {
+        "id": 25,
+        "ts": "2026-05-23T19:18:57.337533",
+        "event": "executed",
+        "event_label": "Executed",
+        "group": "customer",
+        "group_label": "Customer",
+        "description": "SSS güncellendi",
+        "store_id": null,
+        "subject": {
+          "type": null,
+          "id": null
+        },
+        "causer": {
+          "ty
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #17: Timeline olay artışı
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.730861
+DETAY  : önce=0 sonra=31
+
+--------------------------------------------------------------------------------
+TEST #18: İş akışı listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.733103
+DETAY  : 7 iş akışı, örnek: address_sales_drop_and_inventory_risk_seramik_vazo, address_sales_drop_low_stock_support_response, answer_customer_question_size_chart_followup, address_negative_review_and_improve_return_process, answer_customer_question_size_chart
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/workflows?user_id=1&limit=50
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 7,
+        "user_id": 1,
+        "workflow_name": "address_sales_drop_and_inventory_risk_seramik_vazo",
+        "entity_type": "item",
+        "entity_id": 1,
+        "status": "completed",
+        "scheduled_at": "2026-05-23T19:18:43.344922",
+        "cancelled_reason": null,
+        "created_at": "2026-05-23T19:18:43.344961",
+        "updated_at": "2026-05-23T19:18:48.039660",
+        "metadata": {
+          "plan": {
+            "decision": "create_workflow",
+            "workflow_name": "address_sales_drop_and_inventory_risk_seramik_vazo",
+            "reason": "The 'Seramik Vazo' item experienced a significant sales drop of about 26% and is currently at low stock level, presenting a moderate inventory risk (score 0.75). Given the combined sales decline and inventory concern, it is important to implement a workflow focusing on improving sales and managing stock levels. Marketing campaigns involving external Instagram posting require approval and current approvals for these activities are pending. Therefore, we prioritize internal tools to address customer support and operational improvements first, reserving external promotion for after approval.",
+            "tools": [
+              "support_response_tool",
+              "faq_update_tool",
+              "low_stock_notification_tool"
+            ],
+            "priority": "high",
+            "confidence": 0.85,
+            "requires_approval": false,
+            "business_intent": "sales_recovery_and_inventory_management",
+            "delay": 0,
+            "source": "autonomous_ai",
+            "workflow": "address_sales_drop_and_inventory_risk_seramik_vazo",
+            "reasoning": "'sales_recovery_and_inventory_management' için 3 araç seçildi",
+            "task_type": "autonomous_address_sales_drop_and_inventory_risk_se",
+            "entity_type": "item",
+            "entity_id": 1,
+            "task_payload": {
+              "goal": "The 'Seramik Vazo' item experienced a significant sales drop of about 26% and is currently at low stock level, presenting a moderate inventory risk (score 0.75). Given the combined sales decline and inventory concern, it is important to implement a workflow focusing on improving sales and managing stock levels. Marketing campaigns involving external Instagram posting require approval and current approvals for these activities are pending. Therefore, we prioritize internal tools to address customer support and operational improvements first, reserving external promotion for after approval.",
+              "business_intent": "sales_recovery_and_inventory_management",
+              "event": {
+                "id": 11,
+                "name": "sales.updated",
+                "description": "Satış güncellendi: %-26.108533263669408 değişim",
+                "group": "sales",
+                "payload": {
+                  "sales_change_pct": -26.108533263669408,
+                  "sales": 2,
+                  "item_id": 1
+                },
+                "changes": {
+                  "sales": {
+                    "from": 3,
+                    "to": 2
+                  }
+                }
+              },
+              "tools": [
+                "support_response_tool",
+                "faq_update_tool",
+                "low_stock_notification_tool"
+              ],
+              "item": {
+                "id": 1,
+                "store_id": 1,
+                "name": "Seramik Vazo",
+                "price": 327.44,
+                "stock": 5,
+                "sales": 2,
+                "category": "genel",
+                "created_at": "2026-05-23T19:18:10.889888",
+                "updated_at": "2026-05-23T19:18:10.955442",
+                "store": {
+                  "id": 1,
+                  "name": "Teknoloji Köşesi Mağaza-4819",
+                  "owner": "Test Sahibi",
+                  "instagram": "@testshop",
+                  "created_at": "2026-05-23T19:18:10.882778",
+                  "updated_at": "2026-05-23T19:18:10.882778"
+                },
+                "status": "active"
+              },
+              "store": null,
+              "agent": {
+                "agent_id": "marketing",
+                "agent_name": "Marketing Agent",
+                "agent_domain": "marketing",
+                "multi_agent_ready": true
+              }
+            },
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "tools": [
+            "support_response_tool",
+            "faq_update_tool",
+            "low_stock_notification_tool"
+          ],
+          "task_type": "autonomous_address_sales_drop_and_inventory_risk_se",
+          "task_payload": {
+            "goal": "The 'Seramik Vazo' item experienced a significant sales drop of about 26% and is currently at low stock level, presenting a moderate inventory risk (score 0.75). Given the combined sales decline and inventory concern, it is important to implement a workflow focusing on improving sales and managing stock levels. Marketing campaigns involving external Instagram posting require approval and current approvals for these activities are pending. Therefore, we prioritize internal tools to address customer support and operational improvements first, reserving external promotion for after approval.",
+            "business_intent": "sales_recovery_and_inventory_management",
+            "event": {
+              "id": 11,
+              "name": "sales.updated",
+              "description": "Satış güncellendi: %-26.108533263669408 değişim",
+              "group": "sales",
+              "payload": {
+                "sales_change_pct": -26.108533263669408,
+                "sales": 2,
+                "item_id": 1
+              },
+              "changes": {
+                "sales": {
+                  "from": 3,
+                  "to": 2
+                }
+              }
+            },
+            "tools": [
+              "support_response_tool",
+              "faq_update_tool",
+              "low_stock_notification_tool"
+            ],
+            "item": {
+              "id": 1,
+              "store_id": 1,
+              "name": "Seramik Vazo",
+              "price": 327.44,
+              "stock": 5,
+              "sales": 2,
+              "category": "genel",
+              "created_at": "2026-05-23T19:18:10.889888",
+              "updated_at": "2026-05-23T19:18:10.955442",
+              "store": {
+                "id": 1,
+                "name": "Teknoloji Köşesi Mağaza-4819",
+                "owner": "Test Sahibi",
+                "instagram": "@testshop",
+                "created_at": "2026-05-23T19:18:10.882778",
+                "updated_at": "2026-05-23T19:18:10.882778"
+              },
+              "status": "active"
+            },
+            "store": null,
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "requires_approval": false,
+          "approved": true,
+          "source": "autonomous_ai",
+          "business_intent": "sales_recovery_and_inventory_management",
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          }
+        }
+      },
+      {
+        "id": 6,
+        "user_id": 1,
+        "workflow_name": "address_sales_drop_low_stock_support_response",
+        "entity_type": "item",
+        "entity_id": 1,
+        "status": "completed",
+        "scheduled_at": "2026-05-23T19:18:40.756647",
+        "cancelled_reason": null,
+        "created_at": "2026-05-23T19:18:40.756688",
+        "updated_at": "2026-05-23T19:18:43.032536",
+        "metadata": {
+          "plan": {
+            "decision": "create_workflow",
+            "workflow_name": "address_sales_drop_low_stock_support_response",
+            "reason": "The item 'Seramik Vazo' experienced a significant sales drop of 26%, combined with a low stock inventory risk. Given that previous Instagram promotional campaigns require approval and the confidence in marketing impact 
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #19: AI görev listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.734496
+DETAY  : 7 görev, tipler: ['autonomous_answer_customer_question_size_chart_foll', 'autonomous_answer_customer_question_size_chart', 'autonomous_address_sales_drop_low_stock_support_res', 'instagram_launch_campaign', 'autonomous_address_sales_drop_and_inventory_risk_se', 'autonomous_negative_review_customer_dissatisfaction', 'autonomous_address_negative_review_and_improve_retu']
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/tasks?user_id=1&limit=50
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 7,
+        "user_id": 1,
+        "task_type": "autonomous_address_sales_drop_and_inventory_risk_se",
+        "entity_type": "item",
+        "entity_id": 1,
+        "workflow_id": 7,
+        "status": "completed",
+        "payload": "{\"goal\": \"The 'Seramik Vazo' item experienced a significant sales drop of about 26% and is currently at low stock level, presenting a moderate inventory risk (score 0.75). Given the combined sales decline and inventory concern, it is important to implement a workflow focusing on improving sales and managing stock levels. Marketing campaigns involving external Instagram posting require approval and current approvals for these activities are pending. Therefore, we prioritize internal tools to address customer support and operational improvements first, reserving external promotion for after approval.\", \"business_intent\": \"sales_recovery_and_inventory_management\", \"event\": {\"id\": 11, \"name\": \"sales.updated\", \"description\": \"Sat\\u0131\\u015f g\\u00fcncellendi: %-26.108533263669408 de\\u011fi\\u015fim\", \"group\": \"sales\", \"payload\": {\"sales_change_pct\": -26.108533263669408, \"sales\": 2, \"item_id\": 1}, \"changes\": {\"sales\": {\"from\": 3, \"to\": 2}}}, \"tools\": [\"support_response_tool\", \"faq_update_tool\", \"low_stock_notification_tool\"], \"item\": {\"id\": 1, \"store_id\": 1, \"name\": \"Seramik Vazo\", \"price\": 327.44, \"stock\": 5, \"sales\": 2, \"category\": \"genel\", \"created_at\": \"2026-05-23T19:18:10.889888\", \"updated_at\": \"2026-05-23T19:18:10.955442\", \"store\": {\"id\": 1, \"name\": \"Teknoloji K\\u00f6\\u015fesi Ma\\u011faza-4819\", \"owner\": \"Test Sahibi\", \"instagram\": \"@testshop\", \"created_at\": \"2026-05-23T19:18:10.882778\", \"updated_at\": \"2026-05-23T19:18:10.882778\"}, \"status\": \"active\"}, \"store\": null, \"agent\": {\"agent_id\": \"marketing\", \"agent_name\": \"Marketing Agent\", \"agent_domain\": \"marketing\", \"multi_agent_ready\": true}, \"workflow_name\": \"address_sales_drop_and_inventory_risk_seramik_vazo\", \"autonomous\": true}",
+        "ai_result": "We have completed the following actions to address the sales drop and inventory risk for 'Seramik Vazo':\n\n1. A support response has been prepared and deployed to enhance customer support and engagement considering the significant sales decline and low stock.\n2. A low stock notification has been sent to alert relevant teams about the critical low inventory level (5 units) and the moderate risk score (0.75) for timely restocking or management decisions.\n\nThese internal operational steps prioritize immediate support and inventory management while awaiting approval for any external marketing campaigns.",
+        "selected_tool": "low_stock_notification_tool",
+        "retry_count": 0,
+        "error": null,
+        "created_at": "2026-05-23T19:18:48.037491",
+        "updated_at": "2026-05-23T19:19:12.719630"
+      },
+      {
+        "id": 6,
+        "user_id": 1,
+        "task_type": "autonomous_address_sales_drop_low_stock_support_res",
+        "entity_type": "item",
+        "entity_id": 1,
+        "workflow_id": 6,
+        "status": "completed",
+        "payload": "{\"goal\": \"The item 'Seramik Vazo' experienced a significant sales drop of 26%, combined with a low stock inventory risk. Given that previous Instagram promotional campaigns require approval and the confidence in marketing impact is moderate (below 0.72), the recommended approach is to prioritize customer support and operational stability. Prompt support response and FAQ updates related to this product can help manage customer expectations and mitigate further sales decline without external campaign exposure. This workflow leverages internal tools only and aligns with observed buyer behavior and inventory risks.\", \"business_intent\": \"support_and_inventory_management\", \"event\": {\"id\": 11, \"name\": \"sales.updated\", \"description\": \"Sat\\u0131\\u015f g\\u00fcncellendi: %-26.108533263669408 de\\u011fi\\u015fim\", \"group\": \"sales\", \"payload\": {\"sales_change_pct\": -26.108533263669408, \"sales\": 2, \"item_id\": 1}, \"changes\": {\"sales\": {\"from\": 3, \"to\": 2}}}, \"tools\": [\"support_response_tool\", \"faq_update_tool\", \"low_stock_notification_tool\"], \"item\": {\"id\": 1, \"store_id\": 1, \"name\": \"Seramik Vazo\", \"price\": 327.44, \"stock\": 5, \"sales\": 2, \"category\": \"genel\", \"created_at\": \"2026-05-23T19:18:10.889888\", \"updated_at\": \"2026-05-23T19:18:10.955442\", \"store\": {\"id\": 1, \"name\": \"Teknoloji K\\u00f6\\u015fesi Ma\\u011faza-4819\", \"owner\": \"Test Sahibi\", \"instagram\": \"@testshop\", \"created_at\": \"2026-05-23T19:18:10.882778\", \"updated_at\": \"2026-05-23T19:18:10.882778\"}, \"status\": \"active\"}, \"store\": null, \"agent\": {\"agent_id\": \"marketing\", \"agent_name\": \"Marketing Agent\", \"agent_domain\": \"marketing\", \"multi_agent_ready\": true}, \"workflow_name\": \"address_sales_drop_low_stock_support_response\", \"autonomous\": true}",
+        "ai_result": "We have prepared and sent a prompt support response for customers regarding the sales drop of 'Seramik Vazo,' encouraging them to reach out with questions or concerns. The FAQ has been updated to address common inquiries about stock availability, restock dates, and alternatives. Additionally, a low stock alert for the item (with only 5 units remaining) has been issued to facilitate inventory management and prevent stockouts.",
+        "selected_tool": "faq_update_tool",
+        "retry_count": 0,
+        "error": null,
+        "created_at": "2026-05-23T19:18:43.030394",
+        "updated_at": "2026-05-23T19:19:04.742279"
+      },
+      {
+        "id": 5,
+        "user_id": 1,
+        "task_type": "autonomous_answer_customer_question_size_chart_foll",
+        "entity_type": "question",
+        "entity_id": 1,
+        "workflow_id": 5,
+        "status": "completed",
+        "payload": "{\"goal\": \"A customer asked about the availability of a size chart for the top-selling item with low stock (Seramik Vazo). Previous similar workflows were successful in improving customer engagement and satisfaction. Since inventory is in warning state with low stock on this product, it is important to respond promptly with a support reply and update the FAQ without triggering marketing campaigns. This plan aligns with maintaining positive customer sentiment and operational awareness.\", \"business_intent\": \"customer_support_size_chart\", \"event\": {\"id\": 9, \"name\": \"customer.created\", \"description\": \"M\\u00fc\\u015fteri sorusu: Beden tablosu var m\\u0131?\", \"group\": \"customer\", \"payload\": {\"question\": \"Beden tablosu var m\\u0131?\", \"item_id\": 1}, \"changes\": {}}, \"tools\": [\"support_response_tool\", \"faq_update_tool\"], \"item\": null, \"store\": null, \"agent\": {\"agent_id\": \"marketing\", \"agent_name\": \"Marketing Agent\", \"agent_domain\": \"marketing\", \"multi_agent_ready\": true}, \"workflow_name\": \"answer_customer_question_size_chart_followup\", \"autonomous\": true}",
+        "ai_result": "Dear Customer, thank you for reaching out. The size chart for our top-selling item, Seramik Vazo, is available and we will provide you with the details promptly. Please note the item is currently in low stock. Feel free to ask if you need more assistance.\n\nAdditionally, the FAQ has been updated to include that the size chart for Seramik Vazo is available upon request, and customers are advised to order promptly due to low stock.",
+        "selected_tool": "support_response_tool",
+        "retry_count": 0,
+        "error": null,
+        "created_at": "2026-05-23T19:18:38.026487",
+        "updated_at": "2026-05-23T19:18:58.849729"
+      },
+      {
+        "id": 4,
+        "user_id": 1,
+        "task_type": "autonomous_address_negative_review_and_improve_retu",
+        "entity_type": "review",
+        "entity_id": 2,
+        "workflow_id": 4,
+        "status": "completed",
+        "payload": "{\"goal\": \"Olumsuz m\\u00fc\\u015fteri geri bildirimi (puan 1.0) m\\u0
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #20: İş akışı üretimi (orkestrasyon)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.734541
+DETAY  : Δ iş akışı=7, toplam=7
+
+--------------------------------------------------------------------------------
+TEST #21: Kural önizleme (DSL + otonom plan)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.740778
+DETAY  : karar=create_workflow, güven=0.88, araçlar=['instagram_campaign_tool', 'faq_update_tool', 'support_response_tool']
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/internal/rules/preview
+  HTTP 200 (6 ms)
+  Gövde:
+    {
+      "user_id": 1,
+      "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+    }
+
+YANIT:
+  {
+    "success": false,
+    "message": "Could not infer rules — clarification needed",
+    "dsl_preview": "",
+    "full_content_preview": "",
+    "conflicts": [],
+    "duplicates": [],
+    "validation": {
+      "valid": false,
+      "errors": [
+        "no_rules_generated_from_natural_language"
+      ]
+    },
+    "generated_rules": [],
+    "semantic": {
+      "confidence": 0.0,
+      "ambiguities": [
+        "No business intent recognized: 'Ürün indirime girince Instagram paylaşımı oluştur.'"
+      ],
+      "missing_thresholds": [],
+      "requires_confirmation": true,
+      "intents_detected": [],
+      "message": "Could not infer rules — clarification needed",
+      "rule_count": 0
+    },
+    "autonomous_plan": {
+      "decision": "create_workflow",
+      "workflow_name": "discount_promotion_campaign",
+      "workflow": "discount_promotion_campaign",
+      "reason": "Kullanıcı niyeti: sosyal medya içeriği",
+      "tools": [
+        "instagram_campaign_tool",
+        "faq_update_tool",
+        "support_response_tool"
+      ],
+      "priority": "high",
+      "confidence": 0.878,
+      "requires_approval": true,
+      "source": "autonomous_contextual",
+      "business_intent": "discount_promotion",
+      "delay": 0,
+      "task_type": "autonomous_discount_promotion_campaign",
+      "entity_type": "store",
+      "entity_id": 1,
+      "task_payload": {
+        "goal": "Kullanıcı niyeti: sosyal medya içeriği",
+        "business_intent": "discount_promotion",
+        "event": {
+          "id": 0,
+          "name": "intent.user_rule",
+          "description": "Ürün indirime girince Instagram paylaşımı oluştur.",
+          "group": "intent",
+          "payload": {
+            "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+          },
+          "changes": {}
+        },
+        "tools": [
+          "instagram_campaign_tool",
+          "faq_update_tool",
+          "support_response_tool"
+        ],
+        "platform": "instagram",
+        "bi_summary": "Kullanıcı niyeti: sosyal medya içeriği; Kullanıcı niyeti: promosyon / indirim",
+        "agent": {
+          "agent_id": "marketing",
+          "agent_name": "Marketing Agent",
+          "agent_domain": "marketing",
+          "multi_agent_ready": true
+        }
+      },
+      "reasoning": "'discount_promotion' için 3 araç seçildi",
+      "agent": {
+        "agent_id": "marketing",
+        "agent_name": "Marketing Agent",
+        "agent_domain": "marketing",
+        "multi_agent_ready": true
+      },
+      "bi_insights": [
+        "campaign_opportunity",
+        "campaign_opportunity"
+      ],
+      "approval_reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+      "risk_level": "medium"
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #22: Otonom plan önizleme
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.743267
+DETAY  : plan=discount_promotion_campaign
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/internal/rules/preview-autonomous
+  HTTP 200 (2 ms)
+  Gövde:
+    {
+      "user_id": 1,
+      "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+    }
+
+YANIT:
+  {
+    "success": true,
+    "plan": {
+      "decision": "create_workflow",
+      "workflow_name": "discount_promotion_campaign",
+      "workflow": "discount_promotion_campaign",
+      "reason": "Kullanıcı niyeti: sosyal medya içeriği",
+      "tools": [
+        "instagram_campaign_tool",
+        "faq_update_tool",
+        "support_response_tool"
+      ],
+      "priority": "high",
+      "confidence": 0.878,
+      "requires_approval": true,
+      "source": "autonomous_contextual",
+      "business_intent": "discount_promotion",
+      "delay": 0,
+      "task_type": "autonomous_discount_promotion_campaign",
+      "entity_type": "store",
+      "entity_id": 1,
+      "task_payload": {
+        "goal": "Kullanıcı niyeti: sosyal medya içeriği",
+        "business_intent": "discount_promotion",
+        "event": {
+          "id": 0,
+          "name": "intent.user_rule",
+          "description": "Ürün indirime girince Instagram paylaşımı oluştur.",
+          "group": "intent",
+          "payload": {
+            "natural_language": "Ürün indirime girince Instagram paylaşımı oluştur."
+          },
+          "changes": {}
+        },
+        "tools": [
+          "instagram_campaign_tool",
+          "faq_update_tool",
+          "support_response_tool"
+        ],
+        "platform": "instagram",
+        "bi_summary": "Kullanıcı niyeti: sosyal medya içeriği; Kullanıcı niyeti: promosyon / indirim",
+        "agent": {
+          "agent_id": "marketing",
+          "agent_name": "Marketing Agent",
+          "agent_domain": "marketing",
+          "multi_agent_ready": true
+        }
+      },
+      "reasoning": "'discount_promotion' için 3 araç seçildi",
+      "agent": {
+        "agent_id": "marketing",
+        "agent_name": "Marketing Agent",
+        "agent_domain": "marketing",
+        "multi_agent_ready": true
+      },
+      "bi_insights": [
+        "campaign_opportunity",
+        "campaign_opportunity"
+      ],
+      "approval_reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+      "risk_level": "medium"
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #23: Planlayıcı önerileri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.747077
+DETAY  : 20 öneri, uygulanan=20
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/proposals?user_id=1&limit=30
+  HTTP 200 (2 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 20,
+        "user_id": 1,
+        "event_id": 14,
+        "event_name": "banner.updated",
+        "entity_type": "banner",
+        "entity_id": 1,
+        "applied": 1,
+        "apply_result": "stored:requires_approval#13",
+        "created_at": "2026-05-23T19:18:49.473303",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+          "reason": "Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için iyi bir fırsat sunuyor. Ancak dış sosyal yayın araçları kullanıldığı ve onay eşiği 0.72'nin altında güven ile güvenlik tedbiri gerektiriyor, onay süreci gereklidir. Aktif kampanya sayısı ile stok durumu riskli ancak iyi durumda, dolayısıyla ek pazarlama faaliyeti faydalı olabilir.",
+          "tools": [
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "business_intent": "boost_engagement_with_banner",
+          "delay": 0,
+          "source": "autonomous_ai",
+          "workflow": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+          "reasoning": "'boost_engagement_with_banner' için 1 araç seçildi",
+          "task_type": "autonomous_leverage_banner_ctr_in_instagram_campaig",
+          "entity_type": "banner",
+          "entity_id": 1,
+          "task_payload": {
+            "goal": "Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için iyi bir fırsat sunuyor. Ancak dış sosyal yayın araçları kullanıldığı ve onay eşiği 0.72'nin altında güven ile güvenlik tedbiri gerektiriyor, onay süreci gereklidir. Aktif kampanya sayısı ile stok durumu riskli ancak iyi durumda, dolayısıyla ek pazarlama faaliyeti faydalı olabilir.",
+            "business_intent": "boost_engagement_with_banner",
+            "event": {
+              "id": 14,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=13.10%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.131,
+                "click_rate": 0.131,
+                "impressions": 7590,
+                "clicks": 398
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.131
+                }
+              }
+            },
+            "tools": [
+              "instagram_campaign_tool"
+            ],
+            "item": null,
+            "store": null,
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "approval_reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 19,
+        "user_id": 1,
+        "event_id": 14,
+        "event_name": "banner.updated",
+        "entity_type": "banner",
+        "entity_id": 1,
+        "applied": 1,
+        "apply_result": "stored:requires_approval#12",
+        "created_at": "2026-05-23T19:18:46.227522",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "capitalize_engagement_spike_with_banner_instagram_campaign_14",
+          "reason": "Banner CTR has increased significantly to 13.10%, showing a positive engagement spike (strength 0.655). This is an opportunity to leverage the updated banner creatively for an Instagram campaign to maximize store engagement and sales uplift. Given the moderate confidence and presence of pending approvals for Instagram campaigns, approval is required before launch.",
+          "tools": [
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "business_intent": "boost_engagement_and_sales",
+          "delay": 0,
+          "source": "autonomous_ai",
+          "workflow": "capitalize_engagement_spike_with_banner_instagram_campaign_14",
+          "reasoning": "'boost_engagement_and_sales' için 1 araç seçildi",
+          "task_type": "autonomous_capitalize_engagement_spike_with_banner_",
+          "entity_type": "banner",
+          "entity_id": 1,
+          "task_payload": {
+            "goal": "Banner CTR has increased significantly to 13.10%, showing a positive engagement spike (strength 0.655). This is an opportunity to leverage the updated banner creatively for an Instagram campaign to maximize store engagement and sales uplift. Given the moderate confidence and presence of pending approvals for Instagram campaigns, approval is required before launch.",
+            "business_intent": "boost_engagement_and_sales",
+            "event": {
+              "id": 14,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=13.10%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.131,
+                "click_rate": 0.131,
+                "impressions": 7590,
+                "clicks": 398
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.131
+                }
+              }
+            },
+            "tools": [
+              "instagram_campaign_tool"
+            ],
+            "item": null,
+            "store": null,
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "approval_reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 18,
+        "user_id": 1,
+        "event_id": 13,
+        "event_name": "banner.created",
+        "entity_type": "banner",
+        "entity_id": 1,
+        "applied": 1,
+        "apply_result": "noop:A new banner 'Banner Promo-4163' has been created but current business intelligence shows no critical signals, no active related campaigns or marketing needs, and inventories have a warning state with low stock only for 'Seramik Vazo'. The existing campaign and workflows handle the current priority items well, and there is a large number of pending approvals for Instagram campaigns. No urgent marketing action is warranted solely based on banner creation event.",
+        "created_at": "2026-05-23T19:18:45.571795",
+        "proposal": {
+          "decision": "noop",
+          "workflow_name": "",
+          "reason": "A new banner 'Banner Promo-4163' has been created but current business intelligence shows no critical signals, no active related campaigns or marketing needs, and inventories have a warning state with low stock only for 'Seramik Vazo'. The existing campaign and workflows handle the current priority items well, and there is a large number of pending approvals for Instagram campaigns. No urgent marketing action is warranted solely based on banner creation event.",
+          "tools": [
+            "instagram_campaign_tool",
+            "banner_generator_tool",
+            "coupon_generator_tool",
+            "trend_analysis_tool"
+          ],
+          "priority": "low",
+          "confidence": 0.9,
+          "requires_approval": false,
+          "business_intent": "monitor_banner_creation",
+          "delay": 0,
+          "source": "autonomous_ai",
+          "workflow": null,
+          "task_type": "autonomous_autonomous_campaign",
+          "entity_type": "banner",
+          "entity_id": 1,
+          "task_payload": {
+            "goal": "A new banner 'Banner Promo-4163' has been created but current business intelligence shows no critical si
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #24: Planlayıcı öneri üretimi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.747119
+DETAY  : Δ öneri=0, iş akışı Δ=7
+
+--------------------------------------------------------------------------------
+TEST #25: Otomasyon logları
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.749097
+DETAY  : 30 log kaydı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/automation-logs?user_id=1&limit=30
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 31,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:low_stock_notification_tool",
+        "workflow_id": 7,
+        "task_id": 7,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "low_stock_notification_tool",
+        "tool_input": "{\"input_text\": \"Alert: The 'Seramik Vazo' is at low stock level (5 units remaining) with a moderate inventory risk score of 0.75. Please consider restocking or management actions.\"}",
+        "tool_output": "{\"success\": true, \"tool\": \"low_stock_notification_tool\", \"message\": \"D\\u00fc\\u015f\\u00fck stok uyar\\u0131s\\u0131 g\\u00f6nderildi\", \"input_text\": \"Alert: The 'Seramik Vazo' is at low stock level (5 units remaining) with a moderate inventory risk score of 0.75. Please consider restocking or management actions.\"}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 200,
+        "created_at": "2026-05-23T19:19:11.374038",
+        "updated_at": "2026-05-23T19:19:11.374689"
+      },
+      {
+        "id": 30,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:support_response_tool",
+        "workflow_id": 7,
+        "task_id": 7,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "support_response_tool",
+        "tool_input": "{\"input_text\": \"We have noticed a significant sales drop for the 'Seramik Vazo' and currently low stock levels. We are enhancing customer support to address any issues and improve customer engagement immediately.\"}",
+        "tool_output": "{\"success\": true, \"tool\": \"support_response_tool\", \"message\": \"Destek cevab\\u0131 haz\\u0131rland\\u0131\", \"input_text\": \"We have noticed a significant sales drop for the 'Seramik Vazo' and currently low stock levels. We are enhancing customer support to address any issues and improve customer engagement immediately.\"}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 200,
+        "created_at": "2026-05-23T19:19:11.368052",
+        "updated_at": "2026-05-23T19:19:11.368821"
+      },
+      {
+        "id": 29,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:faq_update_tool",
+        "workflow_id": 6,
+        "task_id": 6,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "faq_update_tool",
+        "tool_input": "{\"input_text\": \"FAQ updated for 'Seramik Vazo': Addressing common questions about stock availability, expected restock dates, and suggestions for alternative products to help customers during low stock periods.\"}",
+        "tool_output": "{\"success\": true, \"tool\": \"faq_update_tool\", \"message\": \"SSS g\\u00fcncellendi\", \"input_text\": \"FAQ updated for 'Seramik Vazo': Addressing common questions about stock availability, expected restock dates, and suggestions for alternative products to help customers during low stock periods.\"}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 201,
+        "created_at": "2026-05-23T19:19:02.558829",
+        "updated_at": "2026-05-23T19:19:02.559504"
+      },
+      {
+        "id": 28,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:low_stock_notification_tool",
+        "workflow_id": 6,
+        "task_id": 6,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "low_stock_notification_tool",
+        "tool_input": "{\"input_text\": \"Low stock alert: Only 5 units of 'Seramik Vazo' remain in inventory. Consider inventory replenishment planning to avoid stockout.\"}",
+        "tool_output": "{\"success\": true, \"tool\": \"low_stock_notification_tool\", \"message\": \"D\\u00fc\\u015f\\u00fck stok uyar\\u0131s\\u0131 g\\u00f6nderildi\", \"input_text\": \"Low stock alert: Only 5 units of 'Seramik Vazo' remain in inventory. Consider inventory replenishment planning to avoid stockout.\"}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 200,
+        "created_at": "2026-05-23T19:19:02.549002",
+        "updated_at": "2026-05-23T19:19:02.549576"
+      },
+      {
+        "id": 27,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:support_response_tool",
+        "workflow_id": 6,
+        "task_id": 6,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "support_response_tool",
+        "tool_input": "{\"input_text\": \"We noticed a significant drop in sales for 'Seramik Vazo' and are here to assist you with any questions or concerns. Please reach out to our support team for prompt help regarding availability, product details, or alternatives.\"}",
+        "tool_output": "{\"success\": true, \"tool\": \"support_response_tool\", \"message\": \"Destek cevab\\u0131 haz\\u0131rland\\u0131\", \"input_text\": \"We noticed a significant drop in sales for 'Seramik Vazo' and are here to assist you with any questions or concerns. Please reach out to our support team for prompt help regarding availability, product details, or alternatives.\"}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 201,
+        "created_at": "2026-05-23T19:19:02.543734",
+        "updated_at": "2026-05-23T19:19:02.544416"
+      },
+      {
+        "id": 26,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:support_response_tool",
+        "workflow_id": 5,
+        "task_id": 5,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "support_response_tool",
+        "tool_input": "{\"input_text\": \"Dear Customer, thank you for reaching out. The size chart for our top-selling item, Seramik Vazo, is available and we will provide you with the details promptly. Please note the item is currently in low stock. Feel free to ask if you need more assistance.\"}",
+        "tool_output": "{\"success\": true, \"tool\": \"support_response_tool\", \"message\": \"Destek cevab\\u0131 haz\\u0131rland\\u0131\", \"input_text\": \"Dear Customer, thank you for reaching out. The size chart for our top-selling item, Seramik Vazo, is available and we will provide you with the details promptly. Please note the item is currently in low stock. Feel free to ask if you need more assistance.\"}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 200,
+        "created_at": "2026-05-23T19:18:57.341568",
+        "updated_at": "2026-05-23T19:18:57.342246"
+      },
+      {
+        "id": 25,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:faq_update_tool",
+        "workflow_id": 5,
+        "task_id": 5,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "faq_update_tool",
+        "tool_input": "{\"input_text\": \"Updated FAQ: The size chart for the Seramik Vazo is now available upon request. Customers can contact support for detailed sizing information. Note that the product is in low stock, so prompt orders are advised.\"}",
+        "tool_output": "{\"success\": true, \"tool\": \"faq_update_tool\", \"message\": \"SSS g\\u00fcncellendi\", \"input_text\": \"Updated FAQ: The size chart for the Seramik Vazo is now available upon request. Customers can contact support for detailed sizing information. Note that the product is in low stock, so prompt orders are advised.\"}",
+        "execution_status": "success",
+        "retry_count": 0,
+        "failed_reason": null,
+        "latency_ms": 200,
+        "created_at": "2026-05-23T19:18:57.336049",
+        "updated_at": "2026-05-23T19:18:57.336875"
+      },
+      {
+        "id": 24,
+        "user_id": 1,
+        "event_id": 0,
+        "rule_name": "tool:low_stock_notification_tool",
+        "workflow_id": 4,
+        "task_id": 4,
+        "matched": 1,
+        "ai_decision": "tool_executed",
+        "selected_tool": "low_stock_notification_tool",
+        "tool_input": "{\"input_text\": \"Seramik Vazo \\u00fcr\\u00fcn\\u00fcnde d\\u00fc\\u015f\\u00fck sto
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #26: Araç çalıştırma logları
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.750435
+DETAY  : 17 araç çalıştırması
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/tool-executions?limit=30
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 17,
+        "task_id": 7,
+        "tool_name": "low_stock_notification_tool",
+        "input_payload": "{\"input_text\": \"Alert: The 'Seramik Vazo' is at low stock level (5 units remaining) with a moderate inventory risk score of 0.75. Please consider restocking or management actions.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"low_stock_notification_tool\", \"message\": \"D\\u00fc\\u015f\\u00fck stok uyar\\u0131s\\u0131 g\\u00f6nderildi\", \"input_text\": \"Alert: The 'Seramik Vazo' is at low stock level (5 units remaining) with a moderate inventory risk score of 0.75. Please consider restocking or management actions.\"}",
+        "status": "success",
+        "duration_ms": 200,
+        "error": null,
+        "created_at": "2026-05-23T19:19:11.364670",
+        "task_type": "autonomous_address_sales_drop_and_inventory_risk_se",
+        "user_id": 1
+      },
+      {
+        "id": 16,
+        "task_id": 7,
+        "tool_name": "support_response_tool",
+        "input_payload": "{\"input_text\": \"We have noticed a significant sales drop for the 'Seramik Vazo' and currently low stock levels. We are enhancing customer support to address any issues and improve customer engagement immediately.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"support_response_tool\", \"message\": \"Destek cevab\\u0131 haz\\u0131rland\\u0131\", \"input_text\": \"We have noticed a significant sales drop for the 'Seramik Vazo' and currently low stock levels. We are enhancing customer support to address any issues and improve customer engagement immediately.\"}",
+        "status": "success",
+        "duration_ms": 200,
+        "error": null,
+        "created_at": "2026-05-23T19:19:11.364064",
+        "task_type": "autonomous_address_sales_drop_and_inventory_risk_se",
+        "user_id": 1
+      },
+      {
+        "id": 15,
+        "task_id": 6,
+        "tool_name": "faq_update_tool",
+        "input_payload": "{\"input_text\": \"FAQ updated for 'Seramik Vazo': Addressing common questions about stock availability, expected restock dates, and suggestions for alternative products to help customers during low stock periods.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"faq_update_tool\", \"message\": \"SSS g\\u00fcncellendi\", \"input_text\": \"FAQ updated for 'Seramik Vazo': Addressing common questions about stock availability, expected restock dates, and suggestions for alternative products to help customers during low stock periods.\"}",
+        "status": "success",
+        "duration_ms": 201,
+        "error": null,
+        "created_at": "2026-05-23T19:19:02.539779",
+        "task_type": "autonomous_address_sales_drop_low_stock_support_res",
+        "user_id": 1
+      },
+      {
+        "id": 14,
+        "task_id": 6,
+        "tool_name": "low_stock_notification_tool",
+        "input_payload": "{\"input_text\": \"Low stock alert: Only 5 units of 'Seramik Vazo' remain in inventory. Consider inventory replenishment planning to avoid stockout.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"low_stock_notification_tool\", \"message\": \"D\\u00fc\\u015f\\u00fck stok uyar\\u0131s\\u0131 g\\u00f6nderildi\", \"input_text\": \"Low stock alert: Only 5 units of 'Seramik Vazo' remain in inventory. Consider inventory replenishment planning to avoid stockout.\"}",
+        "status": "success",
+        "duration_ms": 200,
+        "error": null,
+        "created_at": "2026-05-23T19:19:02.539744",
+        "task_type": "autonomous_address_sales_drop_low_stock_support_res",
+        "user_id": 1
+      },
+      {
+        "id": 13,
+        "task_id": 6,
+        "tool_name": "support_response_tool",
+        "input_payload": "{\"input_text\": \"We noticed a significant drop in sales for 'Seramik Vazo' and are here to assist you with any questions or concerns. Please reach out to our support team for prompt help regarding availability, product details, or alternatives.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"support_response_tool\", \"message\": \"Destek cevab\\u0131 haz\\u0131rland\\u0131\", \"input_text\": \"We noticed a significant drop in sales for 'Seramik Vazo' and are here to assist you with any questions or concerns. Please reach out to our support team for prompt help regarding availability, product details, or alternatives.\"}",
+        "status": "success",
+        "duration_ms": 201,
+        "error": null,
+        "created_at": "2026-05-23T19:19:02.539658",
+        "task_type": "autonomous_address_sales_drop_low_stock_support_res",
+        "user_id": 1
+      },
+      {
+        "id": 12,
+        "task_id": 5,
+        "tool_name": "support_response_tool",
+        "input_payload": "{\"input_text\": \"Dear Customer, thank you for reaching out. The size chart for our top-selling item, Seramik Vazo, is available and we will provide you with the details promptly. Please note the item is currently in low stock. Feel free to ask if you need more assistance.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"support_response_tool\", \"message\": \"Destek cevab\\u0131 haz\\u0131rland\\u0131\", \"input_text\": \"Dear Customer, thank you for reaching out. The size chart for our top-selling item, Seramik Vazo, is available and we will provide you with the details promptly. Please note the item is currently in low stock. Feel free to ask if you need more assistance.\"}",
+        "status": "success",
+        "duration_ms": 200,
+        "error": null,
+        "created_at": "2026-05-23T19:18:57.332308",
+        "task_type": "autonomous_answer_customer_question_size_chart_foll",
+        "user_id": 1
+      },
+      {
+        "id": 11,
+        "task_id": 5,
+        "tool_name": "faq_update_tool",
+        "input_payload": "{\"input_text\": \"Updated FAQ: The size chart for the Seramik Vazo is now available upon request. Customers can contact support for detailed sizing information. Note that the product is in low stock, so prompt orders are advised.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"faq_update_tool\", \"message\": \"SSS g\\u00fcncellendi\", \"input_text\": \"Updated FAQ: The size chart for the Seramik Vazo is now available upon request. Customers can contact support for detailed sizing information. Note that the product is in low stock, so prompt orders are advised.\"}",
+        "status": "success",
+        "duration_ms": 200,
+        "error": null,
+        "created_at": "2026-05-23T19:18:57.332352",
+        "task_type": "autonomous_answer_customer_question_size_chart_foll",
+        "user_id": 1
+      },
+      {
+        "id": 10,
+        "task_id": 4,
+        "tool_name": "low_stock_notification_tool",
+        "input_payload": "{\"input_text\": \"Seramik Vazo \\u00fcr\\u00fcn\\u00fcnde d\\u00fc\\u015f\\u00fck stok uyar\\u0131s\\u0131 verilecek.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"low_stock_notification_tool\", \"message\": \"D\\u00fc\\u015f\\u00fck stok uyar\\u0131s\\u0131 g\\u00f6nderildi\", \"input_text\": \"Seramik Vazo \\u00fcr\\u00fcn\\u00fcnde d\\u00fc\\u015f\\u00fck stok uyar\\u0131s\\u0131 verilecek.\"}",
+        "status": "success",
+        "duration_ms": 200,
+        "error": null,
+        "created_at": "2026-05-23T19:18:53.447385",
+        "task_type": "autonomous_address_negative_review_and_improve_retu",
+        "user_id": 1
+      },
+      {
+        "id": 9,
+        "task_id": 4,
+        "tool_name": "coupon_generator_tool",
+        "input_payload": "{\"input_text\": \"M\\u00fc\\u015fteri memnuniyetini art\\u0131rmak i\\u00e7in iade s\\u00fcrecindeki gecikmeye telafi olarak kupon olu\\u015fturulacak.\"}",
+        "output_payload": "{\"success\": true, \"tool\": \"coupon_generator_tool\", \"message\": \"Kupon olu\\u015fturuldu\", \"input_text\": \"M\\u00fc\\u015fteri memnuniyetini art\\u0131rmak i\\u00e7in iade s\\u00fcrecindeki gecikmeye telafi olarak kupon olu\\u015fturulacak.\"}",
+        "status": "success",
+        "duration_ms": 201,
+        "error": null,
+        "created_at": "2026-05-23T19:18:53.447430",
+        "task_type": "autonomous_address_negative_review_and_improve_retu",
+        "user_id": 1
+      },
+      {
+        "id": 8
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #27: Araç kayıt defteri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.751527
+DETAY  : 7 araç tanımlı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/tools/registry
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "name": "instagram_campaign_tool",
+        "category": "marketing",
+        "description": "Instagram kampanyası — dış sosyal yayın (onay gerekir).",
+        "capabilities": [
+          "social_post_draft",
+          "caption_generation",
+          "hashtag_suggestions"
+        ],
+        "supported_business_intents": [
+          "promotion",
+          "discount",
+          "social_media",
+          "instagram",
+          "campaign"
+        ],
+        "risk_level": "medium",
+        "requires_approval": true,
+        "success_rate": 1.0
+      },
+      {
+        "name": "banner_generator_tool",
+        "category": "marketing",
+        "description": "Banner metni ve tasarım özeti — dahili.",
+        "capabilities": [
+          "banner_copy",
+          "promotional_headline",
+          "cta_generation"
+        ],
+        "supported_business_intents": [
+          "banner",
+          "promotion",
+          "campaign",
+          "discount"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 1.0
+      },
+      {
+        "name": "faq_update_tool",
+        "category": "support",
+        "description": "SSS güncelleme — dahili, onay gerekmez.",
+        "capabilities": [
+          "faq_generation",
+          "knowledge_base"
+        ],
+        "supported_business_intents": [
+          "customer_engagement",
+          "faq",
+          "support"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 1.0
+      },
+      {
+        "name": "coupon_generator_tool",
+        "category": "marketing",
+        "description": "Kupon kodu üretimi — dahili taslak.",
+        "capabilities": [
+          "coupon_code",
+          "discount_logic"
+        ],
+        "supported_business_intents": [
+          "promotion",
+          "discount",
+          "campaign"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 1.0
+      },
+      {
+        "name": "support_response_tool",
+        "category": "support",
+        "description": "Müşteri destek yanıt taslağı.",
+        "capabilities": [
+          "reply_draft",
+          "sentiment_response"
+        ],
+        "supported_business_intents": [
+          "reputation",
+          "customer_engagement",
+          "support"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 1.0
+      },
+      {
+        "name": "trend_analysis_tool",
+        "category": "analytics",
+        "description": "Satış ve trend analizi özeti.",
+        "capabilities": [
+          "trend_detection",
+          "sales_summary",
+          "recommendations"
+        ],
+        "supported_business_intents": [
+          "insights",
+          "growth_marketing",
+          "analytics"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 0.91
+      },
+      {
+        "name": "low_stock_notification_tool",
+        "category": "inventory",
+        "description": "Düşük stok uyarısı (kritik yol).",
+        "capabilities": [
+          "inventory_alert"
+        ],
+        "supported_business_intents": [
+          "low_stock",
+          "inventory_risk"
+        ],
+        "risk_level": "low",
+        "requires_approval": false,
+        "success_rate": 1.0
+      }
+    ]
+  }
+
+--------------------------------------------------------------------------------
+TEST #28: İş içgörüleri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.753206
+DETAY  : BI snapshot alındı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/business-insights?user_id=1
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "insights": [
+      {
+        "workflow": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+        "reason": "Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için iyi bir fırsat sunuyor. Ancak dış sosyal yayın araçları kullanıldığı ve onay eşiği 0.72'nin altında güven ile güvenlik tedbiri gerektiriyor, onay süreci gereklidir. Aktif kampanya sayısı ile stok durumu riskli ancak iyi durumda, dolayısıyla ek pazarlama faaliyeti faydalı olabilir.",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "boost_engagement_with_banner",
+        "created_at": "2026-05-23T19:18:49.472121"
+      },
+      {
+        "workflow": "capitalize_engagement_spike_with_banner_instagram_campaign_14",
+        "reason": "Banner CTR has increased significantly to 13.10%, showing a positive engagement spike (strength 0.655). This is an opportunity to leverage the updated banner creatively for an Instagram campaign to maximize store engagement and sales uplift. Given the moderate confidence and presence of pending approvals for Instagram campaigns, approval is required before launch.",
+        "confidence": 0.66,
+        "outcome": "planned",
+        "business_intent": "boost_engagement_and_sales",
+        "created_at": "2026-05-23T19:18:46.226364"
+      },
+      {
+        "workflow": null,
+        "reason": "A new banner 'Banner Promo-4163' has been created but current business intelligence shows no critical signals, no active related campaigns or marketing needs, and inventories have a warning state with low stock only for 'Seramik Vazo'. The existing campaign and workflows handle the current priority items well, and there is a large number of pending approvals for Instagram campaigns. No urgent marketing action is warranted solely based on banner creation event.",
+        "confidence": 0.9,
+        "outcome": "noop",
+        "business_intent": "monitor_banner_creation",
+        "created_at": "2026-05-23T19:18:45.570698"
+      },
+      {
+        "workflow": "launch_instagram_campaign_for_new_banner_promo_4163",
+        "reason": "A new promotional banner 'Banner Promo-4163' has been created for store 1. There is an opportunity to leverage this creative asset for marketing via Instagram to boost store engagement and sales. Although there are multiple pending approvals, the confidence for a social media campaign using Instagram is moderate, so approval is required. The banner creation event indicates readiness for marketing communication aligned with recent successful Instagram campaign workflows.",
+        "confidence": 0.75,
+        "outcome": "planned",
+        "business_intent": "promote_new_banner",
+        "created_at": "2026-05-23T19:18:43.378000"
+      },
+      {
+        "workflow": "address_sales_drop_and_inventory_risk_seramik_vazo",
+        "reason": "The 'Seramik Vazo' item experienced a significant sales drop of about 26% and is currently at low stock level, presenting a moderate inventory risk (score 0.75). Given the combined sales decline and inventory concern, it is important to implement a workflow focusing on improving sales and managing stock levels. Marketing campaigns involving external Instagram posting require approval and current approvals for these activities are pending. Therefore, we prioritize internal tools to address customer support and operational improvements first, reserving external promotion for after approval.",
+        "confidence": 0.85,
+        "outcome": "success",
+        "business_intent": "sales_recovery_and_inventory_management",
+        "created_at": "2026-05-23T19:18:43.342835"
+      },
+      {
+        "workflow": "address_sales_drop_low_stock_support_response",
+        "reason": "The item 'Seramik Vazo' experienced a significant sales drop of 26%, combined with a low stock inventory risk. Given that previous Instagram promotional campaigns require approval and the confidence in marketing impact is moderate (below 0.72), the recommended approach is to prioritize customer support and operational stability. Prompt support response and FAQ updates related to this product can help manage customer expectations and mitigate further sales decline without external campaign exposure. This workflow leverages internal tools only and aligns with observed buyer behavior and inventory risks.",
+        "confidence": 0.8,
+        "outcome": "success",
+        "business_intent": "support_and_inventory_management",
+        "created_at": "2026-05-23T19:18:40.754333"
+      },
+      {
+        "workflow": "promote_new_16pct_discount_campaign_summer_5880",
+        "reason": "New 16% discount campaign 'Kampanya Yaz-5880' launched for the top-selling low stock product 'Seramik Vazo' with inventory warning state. Business intelligence indicates strong campaign opportunity (0.8) and previous similar campaigns showed effective sales boost via Instagram. Given existing pending approvals for external social media posts, workflow includes necessary tasks for approval and Instagram campaign launch to maximize sales and manage inventory risk.",
+        "confidence": 0.8,
+        "outcome": "planned",
+        "business_intent": "promotional_campaign",
+        "created_at": "2026-05-23T19:18:40.088347"
+      },
+      {
+        "workflow": "promote_kampanya_yaz_5880_with_instagram_and_inventory_alert",
+        "reason": "A 16% discount campaign (Kampanya Yaz-5880) was created with a strong campaign opportunity score (0.8). The top-selling product Seramik Vazo has low stock (5 units) and positive customer sentiment. To maximize sales momentum while managing inventory risks, it is effective to run an Instagram promotional campaign combined with a low stock notification. Instagram campaigns require approval due to external publishing policies. This approach leverages positive sentiment and campaign opportunity while addressing inventory warnings.",
+        "confidence": 0.8,
+        "outcome": "planned",
+        "business_intent": "promote_discounted_product_with_inventory_management",
+        "created_at": "2026-05-23T19:18:36.954110"
+      },
+      {
+        "workflow": "answer_customer_question_size_chart_followup",
+        "reason": "A customer asked about the availability of a size chart for the top-selling item with low stock (Seramik Vazo). Previous similar workflows were successful in improving customer engagement and satisfaction. Since inventory is in warning state with low stock on this product, it is important to respond promptly with a support reply and update the FAQ without triggering marketing campaigns. This plan aligns with maintaining positive customer sentiment and operational awareness.",
+        "confidence": 0.9,
+        "outcome": "success",
+        "business_intent": "customer_support_size_chart",
+        "created_at": "2026-05-23T19:18:36.713879"
+      },
+      {
+        "workflow": "address_negative_review_and_improve_return_process",
+        "reason": "Olumsuz müşteri geri bildirimi (puan 1.0) müşteri memnuniyetsizliği ve itibar riski oluşturuyor, özellikle iade süresinin yavaş olduğu şikayeti ön planda. Stok sağlığı uyarı seviyesinde ve en çok satan ürün olan Seramik Vazo için kısa vadede müşteri desteği ve iyileştirme sağlamak kritik. İç destek aracı ve kupon oluşturma ile müşteri memnuniyetini artırıp itibar zedelenmesini önlemeyi hedefliyoruz. Instagram gibi dış sosyal yayın araçları dışındaki dahili araçlar onaysız kullanılabilir.",
+        "confidence": 0.85,
+        "outcome": "success",
+        "business_intent": "customer_satisfaction_recovery",
+        "created_at": "2026-05-23T19:18:33.972639"
+      },
+      {
+        "workflow": "answer_customer_question_size_chart",
+        "reason": "A customer asked about the availability of a size chart for an item. Providing a prompt and helpful support response improves customer engagement and satisfaction. Inventory shows low stock for the asked item, so it is important to include an FAQ update about size chart availability without triggering unnecessary marketing campaigns at this moment.",
+        "confidence": 0.9,
+        "outcome": "success",
+  
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #29: İş durumu grafiği
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.754359
+DETAY  : stok sağlığı=warning
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/business-state?user_id=1
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "generated_at": "2026-05-23T19:19:12.753835",
+    "user_id": 1,
+    "store_id": null,
+    "sales": {
+      "total_item_sales": 2,
+      "top_products": [
+        {
+          "id": 1,
+          "name": "Seramik Vazo",
+          "sales": 2
+        }
+      ]
+    },
+    "inventory": {
+      "total_stock_units": 5,
+      "low_stock_count": 1,
+      "low_stock_items": [
+        {
+          "id": 1,
+          "name": "Seramik Vazo",
+          "stock": 5
+        }
+      ],
+      "health": "warning"
+    },
+    "campaigns": {
+      "active_count": 0,
+      "recent": [
+        {
+          "name": "welcome_instagram_post",
+          "status": "completed",
+          "created_at": "2026-05-23T19:18:12.059058"
+        }
+      ]
+    },
+    "workflows": {
+      "completed": 7
+    },
+    "tasks": {
+      "completed": 7
+    },
+    "engagement": {
+      "pending_approvals": 13,
+      "negative_reviews": 0
+    },
+    "tool_performance": {
+      "banner_generator_tool": {
+        "success": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "coupon_generator_tool": {
+        "success": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "faq_update_tool": {
+        "success": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "instagram_campaign_tool": {
+        "success": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "low_stock_notification_tool": {
+        "success": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "support_response_tool": {
+        "success": 6,
+        "failed": 0,
+        "total": 6
+      }
+    },
+    "sentiment": "positive"
+  }
+
+--------------------------------------------------------------------------------
+TEST #30: Planlayıcı belleği
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.755738
+DETAY  : 20 bellek kaydı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/planner-memory?user_id=1
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 20,
+        "workflow": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "boost_engagement_with_banner | leverage_banner_ctr_in_instagram_campaign_2026_05_23 | Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için | banner.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:49.472121"
+      },
+      {
+        "id": 19,
+        "workflow": "capitalize_engagement_spike_with_banner_instagram_campaign_14",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.66,
+        "summary": "boost_engagement_and_sales | capitalize_engagement_spike_with_banner_instagram_campaign_14 | Banner CTR has increased significantly to 13.10%, showing a positive engagement spike (strength 0.655). This is an oppor | banner.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:46.226364"
+      },
+      {
+        "id": 18,
+        "workflow": null,
+        "decision": "noop",
+        "outcome": "noop",
+        "confidence": 0.9,
+        "summary": "monitor_banner_creation | A new banner 'Banner Promo-4163' has been created but current business intelligence shows no critical signals, no active | banner.created",
+        "feedback": null,
+        "approval_status": "auto",
+        "created_at": "2026-05-23T19:18:45.570698"
+      },
+      {
+        "id": 17,
+        "workflow": "launch_instagram_campaign_for_new_banner_promo_4163",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.75,
+        "summary": "promote_new_banner | launch_instagram_campaign_for_new_banner_promo_4163 | A new promotional banner 'Banner Promo-4163' has been created for store 1. There is an opportunity to leverage this crea | banner.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:43.378000"
+      },
+      {
+        "id": 16,
+        "workflow": "address_sales_drop_and_inventory_risk_seramik_vazo",
+        "decision": "create_workflow",
+        "outcome": "success",
+        "confidence": 0.85,
+        "summary": "sales_recovery_and_inventory_management | address_sales_drop_and_inventory_risk_seramik_vazo | The 'Seramik Vazo' item experienced a significant sales drop of about 26% and is currently at low stock level, presentin | sales.updated",
+        "feedback": null,
+        "approval_status": "auto",
+        "created_at": "2026-05-23T19:18:43.342835"
+      },
+      {
+        "id": 15,
+        "workflow": "address_sales_drop_low_stock_support_response",
+        "decision": "create_workflow",
+        "outcome": "success",
+        "confidence": 0.8,
+        "summary": "support_and_inventory_management | address_sales_drop_low_stock_support_response | The item 'Seramik Vazo' experienced a significant sales drop of 26%, combined with a low stock inventory risk. Given tha | sales.updated",
+        "feedback": null,
+        "approval_status": "auto",
+        "created_at": "2026-05-23T19:18:40.754333"
+      },
+      {
+        "id": 14,
+        "workflow": "promote_new_16pct_discount_campaign_summer_5880",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.8,
+        "summary": "promotional_campaign | promote_new_16pct_discount_campaign_summer_5880 | New 16% discount campaign 'Kampanya Yaz-5880' launched for the top-selling low stock product 'Seramik Vazo' with invento | campaign.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:40.088347"
+      },
+      {
+        "id": 13,
+        "workflow": "promote_kampanya_yaz_5880_with_instagram_and_inventory_alert",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.8,
+        "summary": "promote_discounted_product_with_inventory_management | promote_kampanya_yaz_5880_with_instagram_and_inventory_alert | A 16% discount campaign (Kampanya Yaz-5880) was created with a strong campaign opportunity score (0.8). The top-selling  | campaign.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:36.954110"
+      },
+      {
+        "id": 12,
+        "workflow": "answer_customer_question_size_chart_followup",
+        "decision": "create_workflow",
+        "outcome": "success",
+        "confidence": 0.9,
+        "summary": "customer_support_size_chart | answer_customer_question_size_chart_followup | A customer asked about the availability of a size chart for the top-selling item with low stock (Seramik Vazo). Previous | customer.created",
+        "feedback": null,
+        "approval_status": "auto",
+        "created_at": "2026-05-23T19:18:36.713879"
+      },
+      {
+        "id": 11,
+        "workflow": "address_negative_review_and_improve_return_process",
+        "decision": "create_workflow",
+        "outcome": "success",
+        "confidence": 0.85,
+        "summary": "customer_satisfaction_recovery | address_negative_review_and_improve_return_process | Olumsuz müşteri geri bildirimi (puan 1.0) müşteri memnuniyetsizliği ve itibar riski oluşturuyor, özellikle iade süresini | review.negative",
+        "feedback": null,
+        "approval_status": "auto",
+        "created_at": "2026-05-23T19:18:33.972639"
+      },
+      {
+        "id": 10,
+        "workflow": "answer_customer_question_size_chart",
+        "decision": "create_workflow",
+        "outcome": "success",
+        "confidence": 0.9,
+        "summary": "customer_support | answer_customer_question_size_chart | A customer asked about the availability of a size chart for an item. Providing a prompt and helpful support response imp | customer.created",
+        "feedback": null,
+        "approval_status": "auto",
+        "created_at": "2026-05-23T19:18:33.697679"
+      },
+      {
+        "id": 9,
+        "workflow": "negative_review_customer_dissatisfaction_response",
+        "decision": "create_workflow",
+        "outcome": "success",
+        "confidence": 0.88,
+        "summary": "customer_satisfaction_recovery | negative_review_customer_dissatisfaction_response | There is a strong customer dissatisfaction (0.88) and reputation risk (0.85) from a negative review complaining about sl | review.negative",
+        "feedback": null,
+        "approval_status": "auto",
+        "created_at": "2026-05-23T19:18:31.621852"
+      },
+      {
+        "id": 8,
+        "workflow": "positive_review_engagement_and_low_stock_marketing",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.75,
+        "summary": "boost_sales_and_manage_inventory | positive_review_engagement_and_low_stock_marketing | A recent positive customer review with a 5.0 rating has generated an engagement spike (strength 0.75) on the top-selling | review.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:30.847268"
+      },
+      {
+        "id": 7,
+        "workflow": "instagram_followup_positive_review_campaign",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.75,
+        "summary": "boost_sales_and_engagement | instagram_followup_positive_review_campaign | Positive customer review with 5.0 rating triggers an engagement spike (0.75 strength). The top-selling product 'Seramik  | review.created",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:28.818554"
+      },
+      {
+        "id": 6,
+        "workflow": "promote_discounted_low_stock_ceramic_vase",
+        "decision": "create_workflow",
+        "outcome": "planned",
+        "confidence": 0.8,
+        "summary": "discount_promotion_and_inventory_management | promote_discounted_low_stock_ceramic_vase | The product 'Seramik Vazo' has a new 16% discount applied with a significant price drop which creates a campaign opportu | product.updated",
+        "feedback": null,
+        "approval_status": "pending",
+        "created_at": "2026-05-23T19:18:27.429115"
+      },
+   
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #31: Agent kayıtları
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.756659
+DETAY  : 5 agent tanımı
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/agents
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": "marketing",
+        "name": "Marketing Agent",
+        "domain": "marketing",
+        "description": "Kampanya, sosyal medya, banner ve promosyon planlama",
+        "routes": [
+          "creative",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "marketing"
+        ]
+      },
+      {
+        "id": "analytics",
+        "name": "Analytics Agent",
+        "domain": "analytics",
+        "description": "Trend analizi, satış içgörüleri, performans",
+        "routes": [
+          "analytical",
+          "monitoring",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "analytics",
+          "marketing"
+        ]
+      },
+      {
+        "id": "support",
+        "name": "Support Agent",
+        "domain": "support",
+        "description": "Müşteri soruları, yorumlar, destek kampanyaları",
+        "routes": [
+          "creative",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "support",
+          "marketing"
+        ]
+      },
+      {
+        "id": "inventory",
+        "name": "Inventory Agent",
+        "domain": "inventory",
+        "description": "Stok, sipariş, tedarik — yalnızca kritik deterministik yol",
+        "routes": [
+          "critical"
+        ],
+        "tool_categories": [
+          "inventory"
+        ]
+      },
+      {
+        "id": "executive",
+        "name": "Executive Agent",
+        "domain": "executive",
+        "description": "Üst düzey iş kararları ve onay önerileri",
+        "routes": [
+          "analytical",
+          "monitoring",
+          "hybrid"
+        ],
+        "tool_categories": [
+          "marketing",
+          "analytics"
+        ]
+      }
+    ]
+  }
+
+--------------------------------------------------------------------------------
+TEST #32: Onay kuyruğu listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.759542
+DETAY  : 13 bekleyen onay
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/approvals?user_id=1
+  HTTP 200 (1 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 13,
+        "user_id": 1,
+        "proposal_id": 20,
+        "event_id": 14,
+        "workflow_name": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+        "status": "pending",
+        "risk_level": "medium",
+        "confidence": 0.66,
+        "reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+        "feedback": null,
+        "edited_proposal_json": null,
+        "approved_by": null,
+        "created_at": "2026-05-23T19:18:49.474091",
+        "updated_at": "2026-05-23T19:18:49.474091",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+          "reason": "Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için iyi bir fırsat sunuyor. Ancak dış sosyal yayın araçları kullanıldığı ve onay eşiği 0.72'nin altında güven ile güvenlik tedbiri gerektiriyor, onay süreci gereklidir. Aktif kampanya sayısı ile stok durumu riskli ancak iyi durumda, dolayısıyla ek pazarlama faaliyeti faydalı olabilir.",
+          "tools": [
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "business_intent": "boost_engagement_with_banner",
+          "delay": 0,
+          "source": "autonomous_ai",
+          "workflow": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+          "reasoning": "'boost_engagement_with_banner' için 1 araç seçildi",
+          "task_type": "autonomous_leverage_banner_ctr_in_instagram_campaig",
+          "entity_type": "banner",
+          "entity_id": 1,
+          "task_payload": {
+            "goal": "Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için iyi bir fırsat sunuyor. Ancak dış sosyal yayın araçları kullanıldığı ve onay eşiği 0.72'nin altında güven ile güvenlik tedbiri gerektiriyor, onay süreci gereklidir. Aktif kampanya sayısı ile stok durumu riskli ancak iyi durumda, dolayısıyla ek pazarlama faaliyeti faydalı olabilir.",
+            "business_intent": "boost_engagement_with_banner",
+            "event": {
+              "id": 14,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=13.10%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.131,
+                "click_rate": 0.131,
+                "impressions": 7590,
+                "clicks": 398
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.131
+                }
+              }
+            },
+            "tools": [
+              "instagram_campaign_tool"
+            ],
+            "item": null,
+            "store": null,
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "approval_reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 12,
+        "user_id": 1,
+        "proposal_id": 19,
+        "event_id": 14,
+        "workflow_name": "capitalize_engagement_spike_with_banner_instagram_campaign_14",
+        "status": "pending",
+        "risk_level": "medium",
+        "confidence": 0.66,
+        "reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+        "feedback": null,
+        "edited_proposal_json": null,
+        "approved_by": null,
+        "created_at": "2026-05-23T19:18:46.228323",
+        "updated_at": "2026-05-23T19:18:46.228323",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "capitalize_engagement_spike_with_banner_instagram_campaign_14",
+          "reason": "Banner CTR has increased significantly to 13.10%, showing a positive engagement spike (strength 0.655). This is an opportunity to leverage the updated banner creatively for an Instagram campaign to maximize store engagement and sales uplift. Given the moderate confidence and presence of pending approvals for Instagram campaigns, approval is required before launch.",
+          "tools": [
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.66,
+          "requires_approval": true,
+          "business_intent": "boost_engagement_and_sales",
+          "delay": 0,
+          "source": "autonomous_ai",
+          "workflow": "capitalize_engagement_spike_with_banner_instagram_campaign_14",
+          "reasoning": "'boost_engagement_and_sales' için 1 araç seçildi",
+          "task_type": "autonomous_capitalize_engagement_spike_with_banner_",
+          "entity_type": "banner",
+          "entity_id": 1,
+          "task_payload": {
+            "goal": "Banner CTR has increased significantly to 13.10%, showing a positive engagement spike (strength 0.655). This is an opportunity to leverage the updated banner creatively for an Instagram campaign to maximize store engagement and sales uplift. Given the moderate confidence and presence of pending approvals for Instagram campaigns, approval is required before launch.",
+            "business_intent": "boost_engagement_and_sales",
+            "event": {
+              "id": 14,
+              "name": "banner.updated",
+              "description": "Banner performans güncellendi CTR=13.10%",
+              "group": "banner",
+              "payload": {
+                "ctr": 0.131,
+                "click_rate": 0.131,
+                "impressions": 7590,
+                "clicks": 398
+              },
+              "changes": {
+                "ctr": {
+                  "from": 0,
+                  "to": 0.131
+                }
+              }
+            },
+            "tools": [
+              "instagram_campaign_tool"
+            ],
+            "item": null,
+            "store": null,
+            "agent": {
+              "agent_id": "marketing",
+              "agent_name": "Marketing Agent",
+              "agent_domain": "marketing",
+              "multi_agent_ready": true
+            }
+          },
+          "agent": {
+            "agent_id": "marketing",
+            "agent_name": "Marketing Agent",
+            "agent_domain": "marketing",
+            "multi_agent_ready": true
+          },
+          "approval_reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+          "risk_level": "medium"
+        }
+      },
+      {
+        "id": 11,
+        "user_id": 1,
+        "proposal_id": 17,
+        "event_id": 13,
+        "workflow_name": "launch_instagram_campaign_for_new_banner_promo_4163",
+        "status": "pending",
+        "risk_level": "medium",
+        "confidence": 0.75,
+        "reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+        "feedback": null,
+        "edited_proposal_json": null,
+        "approved_by": null,
+        "created_at": "2026-05-23T19:18:43.379827",
+        "updated_at": "2026-05-23T19:18:43.379827",
+        "proposal": {
+          "decision": "create_workflow",
+          "workflow_name": "launch_instagram_campaign_for_new_banner_promo_4163",
+          "reason": "A new promotional banner 'Banner Promo-4163' has been created for store 1. There is an opportunity to leverage this creative asset for marketing via Instagram to boost store engagement and sales. Although there are multiple pending approvals, the confidence for a social media campaign using Instagram is moderate, so approval is required. The banner creation event indicates readiness for marketing communication aligned with recent successful Instagram campaign workflows.",
+          "tools": [
+            "instagram_campaign_tool"
+          ],
+          "priority": "medium",
+          "confidence": 0.75,
+          "requires_approval": true,
+          "business_intent": "promote_new_banner",
+          "delay": 0,
+          "source": "autonomous_ai",
+          "workflow": "laun
+  … (kısaltıldı)
+
+--------------------------------------------------------------------------------
+TEST #33: Onay işlemi (ilk bekleyen)
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.770180
+DETAY  : HTTP 200
+
+İSTEK:
+  POST http://127.0.0.1:8000/api/internal/approvals/13/approve
+  HTTP 200 (8 ms)
+
+YANIT:
+  {
+    "applied": true,
+    "decision": "create_workflow",
+    "workflow_id": 8,
+    "workflow_name": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+    "proposal": {
+      "decision": "create_workflow",
+      "workflow_name": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+      "reason": "Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için iyi bir fırsat sunuyor. Ancak dış sosyal yayın araçları kullanıldığı ve onay eşiği 0.72'nin altında güven ile güvenlik tedbiri gerektiriyor, onay süreci gereklidir. Aktif kampanya sayısı ile stok durumu riskli ancak iyi durumda, dolayısıyla ek pazarlama faaliyeti faydalı olabilir.",
+      "tools": [
+        "instagram_campaign_tool"
+      ],
+      "priority": "medium",
+      "confidence": 0.66,
+      "requires_approval": false,
+      "business_intent": "boost_engagement_with_banner",
+      "delay": 0,
+      "source": "autonomous_ai",
+      "workflow": "leverage_banner_ctr_in_instagram_campaign_2026_05_23",
+      "reasoning": "'boost_engagement_with_banner' için 1 araç seçildi",
+      "task_type": "autonomous_leverage_banner_ctr_in_instagram_campaig",
+      "entity_type": "banner",
+      "entity_id": 1,
+      "task_payload": {
+        "goal": "Banner etkileşiminde önemli bir artış var (CTR 13.10%). Bu yükseliş, banner'ın Instagram kampanyasında kullanılması için iyi bir fırsat sunuyor. Ancak dış sosyal yayın araçları kullanıldığı ve onay eşiği 0.72'nin altında güven ile güvenlik tedbiri gerektiriyor, onay süreci gereklidir. Aktif kampanya sayısı ile stok durumu riskli ancak iyi durumda, dolayısıyla ek pazarlama faaliyeti faydalı olabilir.",
+        "business_intent": "boost_engagement_with_banner",
+        "event": {
+          "id": 14,
+          "name": "banner.updated",
+          "description": "Banner performans güncellendi CTR=13.10%",
+          "group": "banner",
+          "payload": {
+            "ctr": 0.131,
+            "click_rate": 0.131,
+            "impressions": 7590,
+            "clicks": 398
+          },
+          "changes": {
+            "ctr": {
+              "from": 0,
+              "to": 0.131
+            }
+          }
+        },
+        "tools": [
+          "instagram_campaign_tool"
+        ],
+        "item": null,
+        "store": null,
+        "agent": {
+          "agent_id": "marketing",
+          "agent_name": "Marketing Agent",
+          "agent_domain": "marketing",
+          "multi_agent_ready": true
+        }
+      },
+      "agent": {
+        "agent_id": "marketing",
+        "agent_name": "Marketing Agent",
+        "agent_domain": "marketing",
+        "multi_agent_ready": true
+      },
+      "approval_reason": "Dış sosyal yayın: instagram_campaign_tool — insan onayı gerekli",
+      "risk_level": "medium",
+      "approved": true
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #34: Kural listesi
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.771125
+DETAY  : 1 kural
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/rules?user_id=1
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "data": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "rule_name": "welcome_instagram_post_store_created",
+        "natural_language": "imported from rules.txt",
+        "dsl": "RULE welcome_instagram_post_store_created\nWHEN\nstore.created\nTHEN\nworkflow welcome_instagram_post",
+        "enabled": 1,
+        "created_at": "2026-05-23T19:16:22.027553",
+        "updated_at": "2026-05-23T19:16:22.027553"
+      }
+    ],
+    "user_id": 1,
+    "cache": {
+      "cached_users": [
+        1
+      ],
+      "entries": {
+        "1": {
+          "rule_count": 1,
+          "loaded_at": 821.11477836,
+          "version": 0
+        }
+      }
+    }
+  }
+
+--------------------------------------------------------------------------------
+TEST #35: Önbellek istatistikleri
+DURUM  : BAŞARILI
+ZAMAN  : 2026-05-23T19:19:12.771879
+DETAY  : HTTP 200
+
+İSTEK:
+  GET http://127.0.0.1:8000/api/internal/cache-stats
+  HTTP 200 (0 ms)
+
+YANIT:
+  {
+    "cached_users": [
+      1
+    ],
+    "entries": {
+      "1": {
+        "rule_count": 1,
+        "loaded_at": 821.11477836,
+        "version": 0
+      }
+    }
+  }
+
+================================================================================
+ÖZET
+================================================================================
+Toplam test  : 35
+Başarılı     : 35
+Başarısız    : 0
+
+Orkestrasyon pipeline: VERİ ÜRETTİ ✓
+
+================================================================================

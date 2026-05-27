@@ -1,0 +1,15 @@
+# Secrets & Environment
+.env
+*.env
+
+# Python Caches
+__pycache__/
+*.pyc
+
+# Local Databases
+*.db
+*.db-shm
+*.db-wal
+
+# Editor / IDE Configs
+.vscode/

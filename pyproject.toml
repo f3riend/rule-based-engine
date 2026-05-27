@@ -1,0 +1,17 @@
+[project]
+name = "rule-based-engine"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "cryptography>=42.0.0",
+    "python-dotenv>=1.0.0",
+    "fastapi>=0.136.1",
+    "openai>=1.40.0",
+    "pillow>=12.2.0",
+    "requests>=2.34.2",
+    "uvicorn>=0.47.0",
+    "langgraph>=1.2.1",
+    "langgraph-checkpoint-sqlite>=3.1.0",
+]
